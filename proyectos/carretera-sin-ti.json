@@ -1,0 +1,32 @@
+{
+  "titulo": "Carretera Sin Ti",
+  "artista": "Tu Nombre Artístico",
+  "audio": "demo",
+  "duracion": 32,
+  "bpm": 95,
+  "fps": 30,
+  "vozReactiva": true,
+  "mostrarLetra": true,
+  "colores": { "acento": "#ff8a3d", "acentoNoche": "#3fd6ff", "texto": "#fff6ea" },
+  "escenas": [
+    { "tipo": "titulo", "desde": 0, "hasta": 5, "hora": [0.3, 0.4] },
+    { "tipo": "dron", "desde": 5, "hasta": 10.1, "angulos": ["cenital", "persecucion"], "cada": 2.53, "hora": [0.35, 0.48] },
+    { "tipo": "carretera", "desde": 10.1, "hasta": 13.4, "hora": [0.42, 0.5], "personaje": "medios/personajes/actor_melancolico.png", "lado": "izquierda" },
+    { "tipo": "recuerdo", "desde": 13.4, "hasta": 19.4, "personaje": "medios/personajes/actriz_sonrie.png", "objeto": "El broche dorado" },
+    { "tipo": "dron", "desde": 19.4, "hasta": 22.3, "angulos": ["persecucion"], "hora": [0.7, 0.85] },
+    { "tipo": "carretera", "desde": 22.3, "hasta": 27.4, "hora": [0.8, 1], "personaje": "medios/personajes/actor_perfil.png", "lado": "derecha", "fantasma": "medios/personajes/actriz_mira_atras.png" },
+    { "tipo": "cierre", "desde": 27.4, "hasta": 32, "personaje": "medios/personajes/actor_cuerpo.png" }
+  ],
+  "letra": [
+    { "inicio": 5.2, "fin": 7.6, "texto": "Voy rodando sin rumbo por la carretera" },
+    { "inicio": 7.7, "fin": 10.1, "texto": "buscando tu sombra en cada frontera" },
+    { "inicio": 10.2, "fin": 12.9, "texto": "el sol se despide y tú no regresas" },
+    { "inicio": 13.6, "fin": 16.0, "texto": "me quedan tus besos y tus promesas" },
+    { "inicio": 16.1, "fin": 18.9, "texto": "en el asiento vacío todavía estás" },
+    { "inicio": 19.8, "fin": 22.2, "texto": "De día te busco, de noche te nombro" },
+    { "inicio": 22.3, "fin": 24.7, "texto": "y tu silueta se pierde en el humo" },
+    { "inicio": 24.8, "fin": 27.2, "texto": "sé que ya no estás" },
+    { "inicio": 27.8, "fin": 30.6, "texto": "pero sigo manejando" }
+  ],
+  "voz": null
+}

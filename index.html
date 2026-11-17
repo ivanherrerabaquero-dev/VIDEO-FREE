@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIDEO-FREE · Estudio de videos musicales</title>
+<link rel="stylesheet" href="css/estilo.css">
+</head>
+<body>
+<header>
+  <div class="marca"><span class="punto"></span>VIDEO-FREE <small>estudio de videos musicales</small></div>
+  <div class="estado" id="estado">Cargando…</div>
+</header>
+
+<main>
+  <section class="visor">
+    <div class="marco" id="marco"><canvas id="lienzo"></canvas></div>
+    <div class="pista" id="pista" title="Línea de tiempo: haz clic para saltar"></div>
+    <div class="controles">
+      <button id="btnPlay" class="primario" aria-label="Reproducir o pausar">▶ Reproducir</button>
+      <input type="range" id="cursor" min="0" max="32" step="0.01" value="0" aria-label="Posición">
+      <output id="reloj">0:00.0 / 0:32</output>
+    </div>
+    <div class="controles">
+      <label>Formato <select id="selFormato"><option value="horizontal">Horizontal 16:9</option><option value="vertical">Vertical 9:16</option><option value="cuadrado">Cuadrado 1:1</option></select></label>
+      <label>Modo <select id="selModo"><option value="video">Video musical</option><option value="lyric">Lyric video</option><option value="portada">Portada</option></select></label>
+    </div>
+  </section>
+
+  <section class="panel">
+    <nav id="pestanas" role="tablist">
+      <button data-p="proyecto" class="activa">Proyecto</button><button data-p="escenas">Escenas</button><button data-p="letra">Letra</button><button data-p="voz">Voz</button><button data-p="medios">Medios</button><button data-p="exportar">Exportar</button><button data-p="ideas">Ideas</button><button data-p="github">GitHub</button>
+    </nav>
+
+    <div class="hoja" id="p-proyecto">
+      <h2>Proyecto</h2>
+      <div class="fila"><label>Abrir <select id="selProyecto"></select></label><button id="btnNuevo">Nuevo</button></div>
+      <label>Título <input id="fTitulo"></label>
+      <label>Artista <input id="fArtista"></label>
+      <div class="fila"><label>BPM <input id="fBpm" type="number" min="40" max="220"></label><label>Duración (s) <input id="fDur" type="number" min="1" step="0.1"></label></div>
+      <div class="fila"><label>Acento <input id="fAcento" type="color"></label><label>Acento noche <input id="fNoche" type="color"></label><label>Texto <input id="fTexto" type="color"></label></div>
+      <h3>Canción</h3>
+      <p class="nota" id="infoAudio"></p>
+      <label>Cargar canción desde este equipo <input type="file" id="fAudio" accept="audio/*"></label>
+      <label>O ruta dentro del repo <input id="fAudioRuta" placeholder="medios/audio/mi_cancion.mp3"></label>
+      <div class="fila"><button id="btnGuardar" class="primario">Guardar en GitHub</button><button id="btnBajarJson">Descargar proyecto</button><label class="boton">Abrir archivo<input type="file" id="fJson" accept=".json" hidden></label></div>
+    </div>
+
+    <div class="hoja" id="p-escenas" hidden>
+      <h2>Escenas</h2>
+      <p class="nota">Cada escena va de «desde» a «hasta» en segundos. En «detalles» van sus opciones (personaje, hora del cielo, ángulos del dron…).</p>
+      <div id="listaEscenas"></div>
+      <div class="fila"><button id="btnMasEscena">+ Agregar escena</button></div>
+      <details><summary>Qué opciones tiene cada tipo</summary>
+        <ul class="ayuda">
+          <li><b>titulo</b>: auto de perfil con artista y canción. <code>hora: [0.3, 0.4]</code></li>
+          <li><b>auto</b>: auto de perfil con el paisaje pasando. <code>hora</code></li>
+          <li><b>dron</b>: tomas siguiendo al auto. <code>angulos: ["cenital","persecucion","lateral"]</code>, <code>cada</code> (segundos por toma), <code>hora</code></li>
+          <li><b>carretera</b>: carretera de frente con personaje. <code>personaje</code>, <code>lado</code>, <code>fantasma</code>, <code>hora</code></li>
+          <li><b>recuerdo</b>: luz dorada. <code>personaje</code>, <code>objeto</code></li>
+          <li><b>cierre</b>: noche, auto detenido y créditos. <code>personaje</code></li>
+          <li><b>foto</b>: imagen con zoom. <code>imagen</code>, <code>zoom: [1.05, 1.18]</code></li>
+          <li><b>video</b>: clip a pantalla completa. <code>archivo</code>, <code>inicioClip</code></li>
+        </ul>
+        <p class="nota">«hora» va de 0 (tarde) a 1 (noche): <code>[inicio, fin]</code> de la escena.</p>
+        <p class="nota">Cualquier escena acepta <code>"filtro": "byn"</code> (blanco y negro, para recuerdos), <code>"calido"</code> o <code>"frio"</code>.</p>
+      </details>
+    </div>
+
+    <div class="hoja" id="p-letra" hidden>
+      <h2>Letra</h2>
+      <p class="nota">Una línea de la canción por renglón.</p>
+      <textarea id="tLetra" rows="10" spellcheck="false"></textarea>
+      <div class="fila"><button id="btnToques" class="primario">Sincronizar con toques</button><button id="btnLetraVoz">Acomodar según la voz</button><button id="btnRepartir">Repartir parejo</button></div>
+      <p class="nota" id="infoToques">«Sincronizar con toques»: suena la canción y marcas cada palabra con la barra espaciadora (o tocando el botón) justo cuando se canta.</p>
+      <div id="zonaToques" hidden><div id="palabraActual"></div><button id="btnToque" class="grande">TOCAR (espacio)</button><button id="btnPararToques">Terminar</button></div>
+      <label class="check"><input type="checkbox" id="chkLetra"> Mostrar la letra en el video musical</label>
+    </div>
+
+    <div class="hoja" id="p-voz" hidden>
+      <h2>Voz</h2>
+      <p class="nota">Carga tu voz cantada, ojalá sola y sin pista. El estudio detecta las notas, tu rango, la tonalidad y las frases, y usa esa información en el video.</p>
+      <label>Voz sola desde este equipo <input type="file" id="fVoz" accept="audio/*"></label>
+      <div class="fila"><button id="btnAnalizar" class="primario">Analizar la voz</button><button id="btnAnalizarCancion">Analizar la canción cargada</button></div>
+      <progress id="progVoz" value="0" max="1" hidden></progress>
+      <div id="resVoz" class="tarjetas"></div>
+      <canvas id="grafVoz" width="640" height="150" hidden></canvas>
+      <label class="check"><input type="checkbox" id="chkReactiva"> El brillo del cantante sigue la fuerza de su voz</label>
+    </div>
+
+    <div class="hoja" id="p-medios" hidden>
+      <h2>Medios</h2>
+      <p class="nota">Prepara un personaje: carga una imagen con fondo liso y el estudio se lo quita. Luego la descargas o la subes al repo.</p>
+      <label>Imagen <input type="file" id="fImagen" accept="image/*"></label>
+      <div class="fila"><label>Tolerancia <input type="range" id="rTol" min="8" max="90" value="34"></label><label class="check"><input type="checkbox" id="chkFondo" checked> Quitar fondo</label></div>
+      <canvas id="vistaImagen" class="ajedrez" hidden></canvas>
+      <div class="fila"><label>Guardar como <input id="fNombreMedio" placeholder="medios/personajes/nuevo.png"></label></div>
+      <div class="fila"><button id="btnBajarMedio">Descargar PNG</button><button id="btnSubirMedio" class="primario">Subir al repo</button></div>
+      <h3>Subir canción o clip al repo</h3>
+      <label>Archivo (máx. 40 MB) <input type="file" id="fSubir" accept="audio/*,video/*"></label>
+      <div class="fila"><label>Carpeta <select id="selCarpeta"><option>medios/audio</option><option>medios/escenas</option></select></label><button id="btnSubirArchivo">Subir</button></div>
+    </div>
+
+    <div class="hoja" id="p-exportar" hidden>
+      <h2>Exportar</h2>
+      <p class="nota" id="infoExport"></p>
+      <label class="check"><input type="checkbox" id="chkLufs" checked> Ajustar el volumen a −14 LUFS (YouTube, Spotify, TikTok, Instagram)</label>
+      <div class="fila"><button id="btnGrabar" class="primario">Grabar video</button><button id="btnCancelar" hidden>Cancelar</button><button id="btnPortada">Descargar portada PNG</button></div>
+      <progress id="progExport" value="0" max="1" hidden></progress>
+      <p class="nota">La grabación va en tiempo real. Deja esta pestaña visible hasta que termine: si la minimizas, el navegador frena el dibujo y el video sale a saltos.</p>
+      <div id="resExport"></div>
+    </div>
+
+    <div class="hoja" id="p-ideas" hidden>
+      <h2>Ideas</h2>
+      <p class="nota">Tu libreta. Se guarda en <code>ideas/ideas.md</code> dentro del repo.</p>
+      <textarea id="tIdeas" rows="14"></textarea>
+      <div class="fila"><button id="btnGuardarIdeas" class="primario">Guardar en GitHub</button></div>
+    </div>
+
+    <div class="hoja" id="p-github" hidden>
+      <h2>GitHub</h2>
+      <p class="nota">Para guardar desde el portal necesitas un token personal de GitHub con permiso <b>Contents: Read and write</b> solo sobre este repo. El token queda guardado únicamente en este navegador.</p>
+      <div class="fila"><label>Dueño <input id="gDueno"></label><label>Repo <input id="gRepo"></label><label>Rama <input id="gRama"></label></div>
+      <label>Token <input id="gToken" type="password" autocomplete="off" placeholder="github_pat_…"></label>
+      <div class="fila"><button id="btnConectar" class="primario">Conectar</button><button id="btnOlvidar">Olvidar token</button></div>
+      <p class="nota" id="infoGithub"></p>
+      <details><summary>Cómo crear el token</summary>
+        <ol class="ayuda"><li>En GitHub: Settings → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token.</li><li>Repository access: Only select repositories → VIDEO-FREE.</li><li>Permissions → Repository permissions → Contents: Read and write.</li><li>Copia el token y pégalo aquí.</li></ol>
+      </details>
+    </div>
+  </section>
+</main>
+<footer>© 2026 ivanherrerabaquero-dev. Todos los derechos reservados. Código propio, sin librerías de terceros.</footer>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
