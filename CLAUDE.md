@@ -18,6 +18,7 @@ Estudio web de videos musicales con **código propio**. El dueño no quiere depe
 - `js/motor.js` — motor de dibujo: utilidades, piezas (cielo, paisaje, auto, personaje), escenas (`ESCENAS`), letra karaoke, línea melódica, acabado y `dibujar()`.
 - `js/sonido.js` — carga de audio, pista de prueba sintetizada, medición LUFS.
 - `js/voz.js` — análisis de la voz: tono (YIN), energía, rango, tonalidad, frases.
+- `js/canto.js` — cantante sintético por formantes: texto en español → fonemas → partitura → audio; mezcla con la canción y exporta WAV.
 - `js/exportar.js` — grabación con MediaRecorder y portada PNG.
 - `js/github.js` — leer y guardar en el repo con la API de GitHub.
 - `js/app.js` — la interfaz.

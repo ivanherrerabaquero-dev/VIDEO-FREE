@@ -86,6 +86,13 @@
       <div id="resVoz" class="tarjetas"></div>
       <canvas id="grafVoz" width="640" height="150" hidden></canvas>
       <label class="check"><input type="checkbox" id="chkReactiva"> El brillo del cantante sigue la fuerza de su voz</label>
+      <h3>Voz cantada sintética</h3>
+      <p class="nota">El estudio canta la letra con un sintetizador propio. Usa los tiempos de la pestaña Letra y, si analizaste tu pista de voz, su melodía y su rango. Es una voz de instrumento, no un clon de tu voz.</p>
+      <div class="fila"><label>Melodía <select id="selMelodia"><option value="voz">La de mi pista de voz</option><option value="compuesta">Compuesta por el estudio</option></select></label>
+        <label>Octava <select id="selOctava"><option value="-1">Una abajo</option><option value="0" selected>Igual</option><option value="1">Una arriba</option></select></label>
+        <label>Volumen <input type="range" id="rCanto" min="0" max="1.5" step="0.05" value="0.8"></label></div>
+      <div class="fila"><button id="btnCantar" class="primario">Generar voz cantada</button><button id="btnBajarCanto">Descargar WAV</button><button id="btnQuitarCanto">Quitar</button></div>
+      <p class="nota" id="infoCanto"></p>
     </div>
 
     <div class="hoja" id="p-medios" hidden>
