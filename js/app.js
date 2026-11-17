@@ -3,15 +3,17 @@ import { dibujar, FORMATOS, TIPOS_ESCENA, mediosDe, limitar } from "./motor.js";
 import { contexto, decodificar, cargarAudio, pistaDemo, medirVolumen } from "./sonido.js";
 import { analizarVoz, letraSegunVoz } from "./voz.js";
 import { grabarVideo, exportarImagen, descargar, tipoDisponible } from "./exportar.js";
+import { cantar, mezclar, aWav } from "./canto.js";
 import * as gh from "./github.js";
 
 const $ = (id) => document.getElementById(id);
-const E = { proyecto: null, archivo: "carretera-sin-ti.json", R: { img: {}, video: {}, reproduciendo: false }, buffer: null, bufferVoz: null, t: 0, sonando: false, fuente: null, t0: 0, audioLocal: "" };
+const E = { proyecto: null, archivo: "carretera-sin-ti.json", R: { img: {}, video: {}, reproduciendo: false }, buffer: null, canto: null, mezcla: null, bufferVoz: null, t: 0, sonando: false, fuente: null, t0: 0, audioLocal: "" };
 window.estudio = E; // para depurar desde la consola
 
 const estado = (txt, clase = "") => { $("estado").textContent = txt; $("estado").className = "estado " + clase; };
 const fallo = (e) => { console.error(e); estado(e.message || String(e), "mal"); };
 const seguro = (f) => async (...a) => { try { await f(...a); } catch (e) { fallo(e); } };
+const sonido = () => E.mezcla || E.buffer; // la canción, con la voz cantada si se generó
 const mmss = (s) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, "0")}`;
 const slug = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "proyecto";
 
@@ -42,7 +44,9 @@ async function cargarMedios() {
   if (faltan.length) estado(`No encontré: ${faltan.join(", ")}`, "mal");
 }
 
-async function cargarCancion() {
+function remezclar() { E.mezcla = E.canto ? mezclar(contexto(), E.buffer, E.canto, (E.proyecto.canto && E.proyecto.canto.volumen) ?? 0.8, E.proyecto.duracion) : null; }
+async function cargarCancion() { try { await cargarCancionBase(); } finally { remezclar(); } }
+async function cargarCancionBase() {
   const p = E.proyecto;
   if (E.audioLocal) { $("infoAudio").textContent = `Sonando: ${E.audioLocal} (archivo de este equipo; súbelo en Medios para que quede en el repo).`; return; }
   if (!p.audio || p.audio === "demo") { E.buffer = pistaDemo(p.duracion, p.bpm); $("infoAudio").textContent = "Sonando: pista de prueba generada por el estudio. Carga tu canción para reemplazarla."; return; }
@@ -72,7 +76,7 @@ function parar() {
 async function reproducir(desde = E.t) {
   const ac = contexto(); await ac.resume();
   if (desde >= E.proyecto.duracion - 0.05) desde = 0;
-  if (E.buffer) { E.fuente = ac.createBufferSource(); E.fuente.buffer = E.buffer; E.fuente.connect(ac.destination); E.fuente.start(0, Math.min(desde, E.buffer.duration)); }
+  const b = sonido(); if (b) { E.fuente = ac.createBufferSource(); E.fuente.buffer = b; E.fuente.connect(ac.destination); E.fuente.start(0, Math.min(desde, b.duration)); }
   E.t0 = ac.currentTime - desde; E.sonando = true; E.R.reproduciendo = true; $("btnPlay").textContent = "❚❚ Pausar";
   const cuadro = () => {
     if (!E.sonando) return;
@@ -101,6 +105,7 @@ function llenarFormulario() {
   $("fTitulo").value = p.titulo || ""; $("fArtista").value = p.artista || ""; $("fBpm").value = p.bpm; $("fDur").value = p.duracion;
   $("fAcento").value = p.colores.acento; $("fNoche").value = p.colores.acentoNoche; $("fTexto").value = p.colores.texto;
   $("fAudioRuta").value = p.audio && p.audio !== "demo" ? p.audio : "";
+  const ct = p.canto || {}; $("selMelodia").value = ct.melodia || "voz"; $("selOctava").value = ct.octava || 0; $("rCanto").value = ct.volumen ?? 0.8;
   $("cursor").max = p.duracion; $("chkLetra").checked = p.mostrarLetra !== false; $("chkReactiva").checked = p.vozReactiva !== false;
   $("tLetra").value = (p.letra || []).map((l) => l.texto).join("\n");
   pintarEscenas(); pintarVoz();
@@ -128,10 +133,11 @@ $("fAudio").onchange = seguro(async (e) => {
 $("fAudioRuta").onchange = seguro(async (e) => { parar(); E.audioLocal = ""; E.proyecto.audio = e.target.value.trim() || "demo"; await cargarCancion(); if (E.buffer && E.proyecto.audio !== "demo") { E.proyecto.duracion = Math.round(E.buffer.duration * 10) / 10; llenarFormulario(); } pintarPista(); pintar(); });
 
 async function abrirProyecto(datos, archivo) {
-  parar(); E.proyecto = datos; E.archivo = archivo; E.t = 0; E.audioLocal = "";
+  parar(); E.proyecto = datos; E.archivo = archivo; E.t = 0; E.audioLocal = ""; E.canto = null; E.mezcla = null;
   E.proyecto.colores ||= { acento: "#ff8a3d", acentoNoche: "#3fd6ff", texto: "#fff6ea" }; E.proyecto.escenas ||= []; E.proyecto.letra ||= [];
   llenarFormulario(); pintarPista(); ajustarLienzo();
   await Promise.all([cargarMedios(), cargarCancion().catch(fallo)]);
+  if (E.proyecto.canto && E.proyecto.canto.activo) await generarCanto(true).catch(fallo);
   pintar();
 }
 async function listarProyectos() {
@@ -258,6 +264,24 @@ $("fVoz").onchange = seguro(async (e) => { const f = e.target.files[0]; if (f) {
 $("btnAnalizar").onclick = seguro(() => analizar(E.bufferVoz, "voz sola"));
 $("btnAnalizarCancion").onclick = seguro(() => analizar(E.buffer, "canción completa"));
 
+// ───────────── Voz cantada sintética ─────────────
+async function generarCanto(silencioso = false) {
+  const p = E.proyecto; parar(); leerLetraSiHaceFalta();
+  if (p.voz && p.voz.deCanto) p.voz = null; // el análisis anterior venía del propio cantante sintético
+  p.canto = { activo: true, melodia: $("selMelodia").value, octava: +$("selOctava").value, volumen: +$("rCanto").value };
+  if (!silencioso) estado("Generando la voz cantada…");
+  E.canto = await cantar(p, p.canto); remezclar();
+  const conMelodiaPropia = p.canto.melodia === "voz" && p.voz && p.voz.resumen;
+  if (!p.voz) { p.voz = await analizarVoz(E.canto); p.voz.deCanto = true; pintarVoz(); } // así el video también reacciona a esta voz
+  $("infoCanto").textContent = `Voz cantada lista: ${p.letra.length} líneas, ${conMelodiaPropia ? "con la melodía de tu pista de voz" : "con melodía compuesta por el estudio"}. Si cambias la letra o los tiempos, vuelve a generarla.`;
+  pintar(); if (!silencioso) estado("Voz cantada generada. Pulsa Reproducir para oírla.", "bien");
+}
+const leerLetraSiHaceFalta = () => { if (!(E.proyecto.letra || []).length) leerLetra(); };
+$("btnCantar").onclick = seguro(() => generarCanto());
+$("btnQuitarCanto").onclick = () => { parar(); E.canto = null; E.mezcla = null; if (E.proyecto.canto) E.proyecto.canto.activo = false; if (E.proyecto.voz && E.proyecto.voz.deCanto) { E.proyecto.voz = null; pintarVoz(); } $("infoCanto").textContent = "Voz cantada quitada."; pintar(); };
+$("btnBajarCanto").onclick = seguro(() => { if (!E.canto) throw new Error("Primero genera la voz cantada."); descargar(aWav(E.canto), `${slug(E.proyecto.titulo)}_voz_cantada.wav`); });
+$("rCanto").onchange = () => { if (E.proyecto.canto) E.proyecto.canto.volumen = +$("rCanto").value; const s = E.sonando; if (s) parar(); remezclar(); if (s) reproducir(); };
+
 // ───────────── Medios: quitar fondo y subir ─────────────
 let imagenOriginal = null;
 function quitarFondo(datos, tol) {
@@ -313,10 +337,10 @@ $("btnGrabar").onclick = seguro(async () => {
   parar(); cancelar.ya = false;
   const modo = $("selModo").value === "portada" ? "video" : $("selModo").value, formato = $("selFormato").value;
   let gananciaDb = 0, nota = "";
-  if ($("chkLufs").checked && E.buffer) { estado("Midiendo el volumen…"); const m = await medirVolumen(E.buffer); gananciaDb = m.gananciaDb; nota = ` Volumen: de ${m.lufs.toFixed(1)} a ${m.final.toFixed(1)} LUFS.`; }
+  if ($("chkLufs").checked && sonido()) { estado("Midiendo el volumen…"); const m = await medirVolumen(sonido()); gananciaDb = m.gananciaDb; nota = ` Volumen: de ${m.lufs.toFixed(1)} a ${m.final.toFixed(1)} LUFS.`; }
   $("btnGrabar").disabled = true; $("btnCancelar").hidden = false; $("progExport").hidden = false; estado("Grabando… deja esta pestaña visible.");
   try {
-    const { blob, extension } = await grabarVideo(E.proyecto, E.R, E.buffer, { formato, modo, gananciaDb, cancelar, progreso: (k) => ($("progExport").value = k) });
+    const { blob, extension } = await grabarVideo(E.proyecto, E.R, sonido(), { formato, modo, gananciaDb, cancelar, progreso: (k) => ($("progExport").value = k) });
     const nombre = `${slug(E.proyecto.titulo)}_${modo}_${formato}.${extension}`; descargar(blob, nombre);
     $("resExport").innerHTML = `<p>Listo: <a download="${nombre}" href="${URL.createObjectURL(blob)}">${nombre}</a> (${(blob.size / 1048576).toFixed(1)} MB).${nota}</p>`;
     estado("Video grabado.", "bien");

@@ -51,6 +51,16 @@ Carga tu voz cantada en la pestaña Voz, ojalá sola y sin pista. El estudio cal
 
 Con eso, el video responde a la voz: el brillo del cantante crece cuando canta, el lyric video dibuja la línea melódica, y «Acomodar según la voz» pone cada línea de la letra sobre una frase cantada. Para afinar palabra por palabra, usa «Sincronizar con toques»: suena la canción y marcas cada palabra con la barra espaciadora.
 
+## Voz cantada sintética
+
+En la pestaña Voz, «Generar voz cantada» hace que el estudio cante la letra con un sintetizador propio (síntesis por formantes: una fuente tipo cuerdas vocales, filtros que imitan cada vocal y ruido para las consonantes).
+
+- **Letra y tiempos:** los de la pestaña Letra. Sincroniza primero la letra.
+- **Melodía:** si analizaste tu pista de voz, canta las notas que tú cantaste en cada momento. Si no, compone una melodía dentro de la tonalidad y cerca del centro de tu voz.
+- **Mezcla:** la voz se suma a la canción en la vista previa y en el video exportado. También se descarga sola en WAV.
+
+Es una voz de instrumento, con sonido sintético. No es un clon: no copia tu timbre. Un clon de tu voz necesita un modelo de IA entrenado, que es un servicio externo.
+
 ## Escenas
 
 Cada escena tiene `tipo`, `desde` y `hasta` (segundos) y sus opciones.
@@ -99,6 +109,7 @@ css/estilo.css
 js/motor.js           motor de dibujo y escenas
 js/sonido.js          audio, pista de prueba, LUFS
 js/voz.js             análisis de la voz
+js/canto.js           cantante sintético
 js/exportar.js        grabación y portada
 js/github.js          guardar y leer en el repo
 js/app.js             interfaz
