@@ -11,7 +11,8 @@ Un portal web para armar videos musicales. Todo el código es propio: HTML, CSS 
 | Proyecto | Título, artista, BPM, colores y canción |
 | Escenas | Armar la historia por tiempos |
 | Letra | Karaoke palabra por palabra |
-| Voz | Notas, rango, tonalidad y frases |
+| Música | Pista con instrumentos propios |
+| Voz | Análisis y voz que canta la letra |
 | Medios | Quitar fondo y subir archivos |
 | Exportar | Video y portada |
 | Ideas | Libreta guardada en el repo |
@@ -51,15 +52,20 @@ Carga tu voz cantada en la pestaña Voz, ojalá sola y sin pista. El estudio cal
 
 Con eso, el video responde a la voz: el brillo del cantante crece cuando canta, el lyric video dibuja la línea melódica, y «Acomodar según la voz» pone cada línea de la letra sobre una frase cantada. Para afinar palabra por palabra, usa «Sincronizar con toques»: suena la canción y marcas cada palabra con la barra espaciadora.
 
-## Voz cantada sintética
+## Música
 
-En la pestaña Voz, «Generar voz cantada» hace que el estudio cante la letra con un sintetizador propio (síntesis por formantes: una fuente tipo cuerdas vocales, filtros que imitan cada vocal y ruido para las consonantes).
+La pestaña Música compone y toca la pista con instrumentos propios, sintetizados muestra por muestra: batería, bajo 808, guitarra de nailon (cuerda pulsada Karplus-Strong), piano, cuerdas y percusión. Eliges el estilo (reggaetón, balada pop, trap latino), la tonalidad (o la de tu voz), la progresión de acordes, la intensidad y qué instrumentos suenan. Las secciones siguen la letra: intro hasta que empiezas a cantar, luego versos y coros, y un final.
 
-- **Letra y tiempos:** los de la pestaña Letra. Sincroniza primero la letra.
-- **Melodía:** si analizaste tu pista de voz, canta las notas que tú cantaste en cada momento. Si no, compone una melodía dentro de la tonalidad y cerca del centro de tu voz.
-- **Mezcla:** la voz se suma a la canción en la vista previa y en el video exportado. También se descarga sola en WAV.
+## La voz que canta la letra
 
-Es una voz de instrumento, con sonido sintético. No es un clon: no copia tu timbre. Un clon de tu voz necesita un modelo de IA entrenado, que es un servicio externo.
+En la pestaña Voz, «Generar voz cantada» canta la letra con sus tiempos. Hay dos motores:
+
+- **Voz sintética mejorada.** Síntesis por formantes: una fuente glotal con pequeñas irregularidades humanas (jitter, shimmer, aire), cinco formantes que se mueven de una vocal a otra, nasales, consonantes con ruido filtrado, portamento, vibrato que llega tarde, un doblaje y reverb. Suena mucho más natural que la versión anterior, pero sigue siendo una voz sintética.
+- **Con mis vocales (tu timbre).** Grabas las cinco vocales sostenidas en «Mi banco de vocales» y el estudio las reafina nota por nota (PSOLA), conservando tu color de voz. Las consonantes salen del motor sintético. El banco se guarda en `medios/voz/`.
+
+La melodía sale de tu pista de voz analizada (con afinador automático opcional) o se compone sobre los acordes de la pista, con frases que se repiten como en una canción. La voz se mezcla con la pista, que baja un poco cuando cantas, y se descarga sola en WAV.
+
+Ningún motor es un clon de voz con IA: eso requiere modelos entrenados y servicios externos.
 
 ## Escenas
 
@@ -107,9 +113,11 @@ Chrome y Edge graban en MP4 cuando el equipo tiene codificador H.264; si no, en 
 index.html            el portal
 css/estilo.css
 js/motor.js           motor de dibujo y escenas
-js/sonido.js          audio, pista de prueba, LUFS
+js/sonido.js          audio y LUFS
+js/dsp.js             filtros, reverb, compresor
+js/instrumentos.js    instrumentos y arreglista
 js/voz.js             análisis de la voz
-js/canto.js           cantante sintético
+js/canto.js           voz que canta la letra
 js/exportar.js        grabación y portada
 js/github.js          guardar y leer en el repo
 js/app.js             interfaz
