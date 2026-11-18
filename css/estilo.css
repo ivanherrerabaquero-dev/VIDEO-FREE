@@ -50,3 +50,11 @@ progress{width:100%;accent-color:var(--acento);margin:8px 0}
 #palabraActual{font-size:26px;font-weight:800;text-align:center;min-height:42px;color:var(--acento)}
 #resExport a{color:var(--frio)}
 footer{padding:16px 20px 28px;color:var(--suave);font-size:12px;text-align:center}
+.instrumentos{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin:10px 0}
+.instrumentos label{margin:0}
+.vocal{display:grid;grid-template-columns:36px 1fr auto auto auto;gap:8px;align-items:center;margin:6px 0}
+.vocal b{font-size:20px;text-align:center;color:var(--acento)}.vocal span{color:var(--suave);font-size:12px}
+.vocal button,.vocal .boton{padding:6px 9px;font-size:13px}
+@media(max-width:480px){.vocal{grid-template-columns:30px 1fr;}.vocal span{grid-column:2}}
+label>input[type=range]{display:block;width:100%;margin-top:8px;accent-color:var(--acento)}
+nav button{padding:11px 10px}

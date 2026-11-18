@@ -29,6 +29,11 @@ export function tonoDeVentana(x, ini, N, sr, fmin = 75, fmax = 700, umbral = 0.1
     if (d[tau] < umbral) { while (tau + 1 <= tMax && d[tau + 1] < d[tau]) tau++; mejor = tau; break; }
   }
   if (mejor < 0) return 0;
+  // Corrección de octava: si el doble del periodo encaja mucho mejor, el primero era un armónico
+  for (let rep = 0; rep < 2 && mejor * 2 + 2 <= tMax; rep++) {
+    let m2 = mejor * 2; for (let t2 = mejor * 2 - 2; t2 <= mejor * 2 + 2; t2++) if (d[t2] < d[m2]) m2 = t2;
+    if (d[mejor] > 0.06 && d[m2] < d[mejor] * 0.5) mejor = m2; else break;
+  }
   const a = d[mejor - 1] ?? d[mejor], b = d[mejor], c = d[mejor + 1] ?? d[mejor], den = a - 2 * b + c; // afinado fino
   return sr / (mejor + (den ? (0.5 * (a - c)) / den : 0));
 }

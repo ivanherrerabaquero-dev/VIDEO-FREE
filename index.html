@@ -29,7 +29,7 @@
 
   <section class="panel">
     <nav id="pestanas" role="tablist">
-      <button data-p="proyecto" class="activa">Proyecto</button><button data-p="escenas">Escenas</button><button data-p="letra">Letra</button><button data-p="voz">Voz</button><button data-p="medios">Medios</button><button data-p="exportar">Exportar</button><button data-p="ideas">Ideas</button><button data-p="github">GitHub</button>
+      <button data-p="proyecto" class="activa">Proyecto</button><button data-p="escenas">Escenas</button><button data-p="letra">Letra</button><button data-p="musica">Música</button><button data-p="voz">Voz</button><button data-p="medios">Medios</button><button data-p="exportar">Exportar</button><button data-p="ideas">Ideas</button><button data-p="github">GitHub</button>
     </nav>
 
     <div class="hoja" id="p-proyecto">
@@ -77,6 +77,20 @@
       <label class="check"><input type="checkbox" id="chkLetra"> Mostrar la letra en el video musical</label>
     </div>
 
+    <div class="hoja" id="p-musica" hidden>
+      <h2>Música</h2>
+      <p class="nota">El estudio compone y toca la pista con sus propios instrumentos. Las secciones siguen tu letra: intro hasta que empiezas a cantar, luego versos y coros de 8 compases (4 en canciones cortas) y un final.</p>
+      <div class="fila"><label>Estilo <select id="selEstilo"><option value="reggaeton">Reggaetón</option><option value="balada">Balada pop</option><option value="trap">Trap latino</option></select></label>
+        <label>Tonalidad <select id="selTonalidad"></select></label></div>
+      <div class="fila"><label>Progresión <select id="selProgresion"><option value="0">Clásica</option><option value="1">Alternativa</option><option value="2">Tensa</option></select></label>
+        <label>Intensidad <input type="range" id="rIntensidad" min="0.3" max="1" step="0.05" value="0.8"></label></div>
+      <div class="instrumentos" id="cajaInstrumentos"></div>
+      <div class="fila"><button id="btnPista" class="primario">Generar pista</button><button id="btnBpmEstilo">Usar el BPM del estilo</button><button id="btnBajarPista">Descargar pista WAV</button></div>
+      <progress id="progPista" value="0" max="1" hidden></progress>
+      <p class="nota" id="infoPista"></p>
+      <p class="nota">Si cargas tu propia canción en la pestaña Proyecto, se usa esa en lugar de la pista generada.</p>
+    </div>
+
     <div class="hoja" id="p-voz" hidden>
       <h2>Voz</h2>
       <p class="nota">Carga tu voz cantada, ojalá sola y sin pista. El estudio detecta las notas, tu rango, la tonalidad y las frases, y usa esa información en el video.</p>
@@ -86,13 +100,23 @@
       <div id="resVoz" class="tarjetas"></div>
       <canvas id="grafVoz" width="640" height="150" hidden></canvas>
       <label class="check"><input type="checkbox" id="chkReactiva"> El brillo del cantante sigue la fuerza de su voz</label>
-      <h3>Voz cantada sintética</h3>
-      <p class="nota">El estudio canta la letra con un sintetizador propio. Usa los tiempos de la pestaña Letra y, si analizaste tu pista de voz, su melodía y su rango. Es una voz de instrumento, no un clon de tu voz.</p>
-      <div class="fila"><label>Melodía <select id="selMelodia"><option value="voz">La de mi pista de voz</option><option value="compuesta">Compuesta por el estudio</option></select></label>
-        <label>Octava <select id="selOctava"><option value="-1">Una abajo</option><option value="0" selected>Igual</option><option value="1">Una arriba</option></select></label>
-        <label>Volumen <input type="range" id="rCanto" min="0" max="1.5" step="0.05" value="0.8"></label></div>
-      <div class="fila"><button id="btnCantar" class="primario">Generar voz cantada</button><button id="btnBajarCanto">Descargar WAV</button><button id="btnQuitarCanto">Quitar</button></div>
+      <h3>Voz que canta la letra</h3>
+      <p class="nota">Usa la letra y sus tiempos (pestaña Letra). La melodía sale de tu pista de voz analizada o se compone sobre los acordes de la pista.</p>
+      <div class="fila"><label>Motor <select id="selMotor"><option value="sintetica">Voz sintética mejorada</option><option value="mivoz">Con mis vocales (tu timbre)</option></select></label>
+        <label>Timbre <select id="selTimbre"><option value="masculina">Masculino</option><option value="femenina">Femenino</option></select></label></div>
+      <div class="fila"><label>Melodía <select id="selMelodia"><option value="voz">La de mi pista de voz</option><option value="compuesta">Compuesta sobre los acordes</option></select></label>
+        <label>Octava <select id="selOctava"><option value="-1">Una abajo</option><option value="0" selected>Igual</option><option value="1">Una arriba</option></select></label></div>
+      <div class="fila"><label>Aire en la voz <input type="range" id="rAire" min="0" max="0.25" step="0.01" value="0.08"></label><label>Volumen <input type="range" id="rCanto" min="0" max="1.5" step="0.05" value="0.85"></label></div>
+      <label class="check"><input type="checkbox" id="chkAfinar" checked> Afinar las notas de mi pista al semitono (afinador automático)</label>
+      <div class="fila"><button id="btnCantar" class="primario">Generar voz cantada</button><button id="btnBajarCanto">Descargar voz WAV</button><button id="btnQuitarCanto">Quitar</button></div>
+      <progress id="progCanto" value="0" max="1" hidden></progress>
       <p class="nota" id="infoCanto"></p>
+      <details id="bancoVocales"><summary>Mi banco de vocales (para cantar con tu timbre)</summary>
+        <p class="nota">Graba cada vocal sostenida unos 2 segundos, en una sola nota cómoda, sin vibrato y en un lugar sin eco. El estudio la reafina a cada nota de la melodía conservando tu color de voz.</p>
+        <div id="filasVocales"></div>
+        <div class="fila"><button id="btnGuardarBanco">Guardar banco en GitHub</button></div>
+        <p class="nota" id="infoBanco"></p>
+      </details>
     </div>
 
     <div class="hoja" id="p-medios" hidden>
