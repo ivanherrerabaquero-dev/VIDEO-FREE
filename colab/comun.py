@@ -217,6 +217,18 @@ def alinear_letra(palabras: list[dict], lineas: list[str]) -> list[dict]:
             w = palabras[bloque.a + k]
             tiempos[bloque.b + k] = (w["inicio"], w["fin"])
     conocidos = [i for i, t in enumerate(tiempos) if t]
+    if len(conocidos) < max(3, 0.35 * len(letra)) and palabras:
+        # Whisper entendió poco de lo que se canta: reparte la letra a lo largo del tramo cantado, según el largo de cada línea
+        print(f"Aviso: solo reconocí {len(conocidos)} de {len(letra)} palabras; reparto la letra en el tramo cantado. Ajusta los tiempos en el portal.")
+        t0, t1 = palabras[0]["inicio"], palabras[-1]["fin"]
+        pesos = [len(l) + 6 for l in lineas]
+        total, acum, salida = sum(pesos), 0, []
+        for l, w in zip(lineas, pesos):
+            a = t0 + (t1 - t0) * acum / total
+            acum += w
+            b = t0 + (t1 - t0) * acum / total - 0.1
+            salida.append({"inicio": round(a, 2), "fin": round(max(a + 0.3, b), 2), "texto": l})
+        return salida
     if not conocidos:
         raise ValueError("No pude alinear la letra con lo que se canta. ¿Es la misma letra?")
     for i, t in enumerate(tiempos):  # rellena palabras que Whisper no entendió
