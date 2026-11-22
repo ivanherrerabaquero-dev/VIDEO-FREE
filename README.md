@@ -80,14 +80,17 @@ Para lo que el código propio del navegador no alcanza (una voz humana natural, 
 | 4 · Labios | Boca sincronizada con el canto | L4/A100 (T4 a 256 px) |
 | 5 · Director | El video completo, toma por toma | A100/L4 (T4 experimental) |
 | 6 · Entrenar personaje | La IA aprende tu cara | T4 |
+| 7 · Director en Kaggle | 2 GPU gratis más para el director | Kaggle T4 x2 |
 
 1. **Canción con voz** (ACE-Step 1.5): toma tu letra, el estilo, el BPM y la tonalidad, y genera la canción completa con voz cantando en español. Separa la voz (Demucs) y sincroniza la letra palabra por palabra (Whisper).
 2. **Mi voz** (RVC): entrenas un modelo con 10 minutos o más de tu voz limpia y la voz de la canción pasa a ser la tuya, con la misma melodía. El modelo queda en tu Drive.
 3. **Video IA** (Wan 2.2 / 2.1): crea tomas realistas de unos 5 segundos desde un texto o desde una imagen, por ejemplo tu hoja de personaje. Las pone en las escenas que tengan `"ia"`, o en todas.
 4. **Labios** (LatentSync): toma una escena donde se ve la cara del cantante y le mueve la boca al ritmo de la parte de la canción que suena en esa escena.
 
-5. **Director**: hace el video musical completo. Escribe un plano de tomas sobre los compases de la canción (dron de apertura, se sube al auto, canta manejando, la copiloto tararea, manos en el volante, guitarra, recuerdo en blanco y negro, noche, fantasma, cierre). Para cada toma pinta un fotograma fotorrealista (RealVisXL) conservando la cara exacta del recorte de tu personaje, lo anima con Wan 2.2, sincroniza los labios en las tomas donde canta y monta todo con color de cine, grano y la canción. Guarda cada paso en tu Drive para retomar si Colab se desconecta. Las tomas quedan como escenas del portal.
-6. **Entrenar personaje** (LoRA de SDXL): aprende tu cara con tus recortes y tus fotos para que el director te ponga en cualquier pose.
+5. **Director**: hace el video musical completo. Escribe un plano de tomas sobre los compases de la canción (dron de apertura, se sube al auto, canta manejando, la copiloto tararea, manos en el volante, guitarra, recuerdo en blanco y negro, noche, fantasma, cierre). Para cada toma pinta un fotograma fotorrealista (RealVisXL) conservando la cara exacta del recorte de tu personaje, lo anima con Wan 2.2, sincroniza los labios en las tomas donde canta y monta todo con color de cine, grano y la canción. Guarda cada paso en tu Drive para retomar si Colab se desconecta. Las tomas quedan como escenas del portal. El modo rápido usa modelos ya entrenados para ir rápido: FastWan 2.2 (video en 3 pasos en vez de 30) y RealVisXL Lightning (imágenes en 6 pasos).
+6. **Entrenar personajes** (LoRA de SDXL): crea fotos nuevas de tu cara exacta en otros lugares y luces, entrena al actor y a la actriz (se puede dejar toda la noche, con puntos de control en Drive), compara los puntos de control y guarda el mejor para que el director te ponga en cualquier pose.
+
+7. **Director en Kaggle**: Kaggle da gratis 2 GPU T4 a la vez. Este cuaderno las pone a trabajar en el mismo video que Colab: las 3 GPU se reparten las tomas y las comparten por tu repo (`medios/director/`); Colab monta el video al final. La instalación de LatentSync se guarda en tu Drive para no repetirla en cada sesión de Colab.
 
 La sincronización de la letra usa faster-whisper (más rápido, con la letra como pista) y, si falla, Whisper con transformers.
 

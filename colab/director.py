@@ -22,8 +22,8 @@ from pathlib import Path
 from PIL import Image, ImageFilter
 
 # ───────────────────────── Estilo general ─────────────────────────
-ESTILO_FOTO = ("cinematic film still, shot on ARRI Alexa, 35mm anamorphic lens, natural skin texture, realistic, "
-               "highly detailed, shallow depth of field, film grain, color graded music video")
+# Corto a propósito: SDXL solo lee 77 «tokens» por prompt; lo que sobra se pierde.
+ESTILO_FOTO = "cinematic film still, 35mm, realistic skin, film grain"
 NEGATIVO_FOTO = ("cartoon, illustration, painting, 3d render, cgi, anime, plastic skin, deformed, disfigured, extra limbs, "
                  "extra fingers, bad hands, bad anatomy, blurry, low quality, text, watermark, logo, two heads, duplicate person")
 MOVIMIENTO_COMUN = "realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face"
@@ -31,7 +31,10 @@ NEGATIVO_VIDEO = ("static, frozen, still image, slideshow, blurry, low quality, 
                   "morphing face, extra fingers, poorly drawn hands, distorted car, melting, text, subtitles, watermark, logo, "
                   "overexposed, flicker")
 
-AUTO = "black 1969 convertible muscle car with chrome details"
+AUTO = "black 1969 convertible muscle car with the top down"
+# Cómo se ve el protagonista cuando no se usa su recorte (de espaldas o de lejos): coincide con sus fotos.
+ACTOR = "a young man with messy dark brown hair and a short beard, black leather jacket, white t-shirt, dark jeans"
+ACTRIZ = "a young woman with long wavy brown hair, black blazer, dark red shirt and tie"
 
 
 def hora_texto(h: float) -> str:
@@ -60,15 +63,16 @@ TOMAS = {
     "dron_apertura": dict(
         compases=2, prioridad=1,
         imagen="aerial drone view high above an endless empty desert highway, a tiny {auto} driving alone, mountains on the horizon, {hora}",
-        mueve="the drone slowly flies forward and tilts down following the car on the highway, dust behind the wheels"),
+        mueve="the drone slowly flies forward and tilts down following the black open-top convertible on the highway, dust behind the wheels"),
     "sube_al_auto": dict(
-        compases=2, prioridad=1, personaje="actor_cuerpo.png", encuadre="cuerpo_izquierda",
-        imagen="a young man standing next to a parked {auto} on the gravel shoulder of a desert highway, full body, {hora}",
-        mueve="the man walks to the convertible, opens the driver door, gets in and sits behind the steering wheel, closes the door, natural body movement"),
+        # sin recorte: visto de espaldas y de lejos, para que camine y se suba con movimiento natural
+        compases=2, prioridad=1,
+        imagen="wide shot from behind, {actor} walking toward a parked {auto} on the gravel shoulder of a desert highway, {hora}",
+        mueve="the man walks to the open-top convertible, opens the driver door, gets in and sits behind the steering wheel, natural body movement"),
     "canta_volante": dict(
         compases=2, prioridad=1, personaje="actor_canta.png", encuadre="primer_plano", canta=True,
         imagen="close-up of a young man singing while driving a {auto} with the top down, hands on the steering wheel, desert road behind him, wind in his hair, {hora}",
-        mueve="he sings with emotion while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past"),
+        mueve="he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past"),
     "detalle_rueda": dict(
         compases=1, prioridad=4,
         imagen="low angle close-up of the chrome wheel of a {auto} rolling fast on cracked asphalt, {hora}",
@@ -96,26 +100,30 @@ TOMAS = {
     "canta_campo": dict(
         compases=2, prioridad=3, personaje="actor_melancolico.png", encuadre="primer_plano",
         canta=True, imagen="a melancholic young man standing in a field of tall dry grass next to a parked {auto}, {hora}",
-        mueve="he sings with sadness, puts a hand on his chest, looks down and then up at the sky, slow camera push in, the grass moves in the wind"),
+        mueve="he sings the lyrics with sadness and clear mouth movements, puts a hand on his chest, looks down and then up at the sky, slow camera push in, the grass moves in the wind"),
+    "canta_capo": dict(
+        compases=2, prioridad=4, personaje="actor_canta.png", encuadre="medio_izquierda", canta=True,
+        imagen="a young man singing while sitting on the hood of a parked {auto} at a desert roadside, mountains behind, {hora}",
+        mueve="he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair"),
     "dron_atardecer": dict(
         compases=2, prioridad=3,
         imagen="aerial drone shot circling a {auto} driving on a winding mountain desert road, {hora}",
-        mueve="the drone orbits slowly around the moving car, the car follows the curve of the road, headlights turn on"),
+        mueve="the drone orbits slowly around the moving black open-top convertible, the car follows the curve of the road, headlights turn on"),
     "canta_noche": dict(
         compases=2, prioridad=2, personaje="actor_perfil.png", encuadre="primer_plano", canta=True, hora_fija=0.9,
         imagen="close-up of a young man singing at night inside a {auto}, face lit by the warm dashboard glow and passing street lights, {hora}",
-        mueve="he sings with longing, passing lights sweep across his face, he glances at the empty passenger seat"),
+        mueve="he sings the lyrics with longing and clear mouth movements, passing lights sweep across his face, he glances at the empty passenger seat"),
     "fantasma": dict(
-        compases=2, prioridad=2, personaje="actriz_cuerpo.png", encuadre="cuerpo_derecha", hora_fija=0.95, grado="fantasma",
-        imagen="a translucent ghostly young woman standing in the middle of an empty desert highway at night, lit by car headlights, mist, {hora}",
+        compases=2, prioridad=2, hora_fija=0.95, grado="fantasma",
+        imagen="a translucent ghostly figure of {actriz} in the middle of an empty desert highway at night, lit by car headlights, mist, {hora}",
         mueve="the ghostly woman looks at the camera, the mist moves around her, she slowly fades and dissolves into the headlights"),
     "maquina_ritmos": dict(
         compases=1, prioridad=5,
         imagen="close-up of fingers tapping the glowing pads of a drum machine on the passenger seat of a vintage car at night, neon reflections",
         mueve="fingers tap the pads to a reggaeton beat, the pads light up with each hit"),
     "cierre": dict(
-        compases=2, prioridad=1, personaje="actor_cuerpo.png", encuadre="cuerpo_izquierda", hora_fija=1.0,
-        imagen="wide shot, a {auto} stopped on the shoulder of a desert highway at night under a sky full of stars, a young man standing beside it, {hora}",
+        compases=2, prioridad=1, hora_fija=1.0,
+        imagen="wide shot, a {auto} stopped on the shoulder of a desert highway under a sky full of stars, {actor} leaning on it seen from the side, {hora}",
         mueve="the man leans on the car and looks up at the stars, slow camera pull back, the headlights fade out"),
 }
 
@@ -165,7 +173,7 @@ def planear(duracion: float, bpm: float = 95, letra: list | None = None, hora: t
             break
         h = d.get("hora_fija", hora[0] + (hora[1] - hora[0]) * (inicio / max(duracion, 1e-6)))
         vista = hora_texto(h)
-        imagen = d["imagen"].format(auto=AUTO, hora=vista)
+        imagen = d["imagen"].format(auto=AUTO, hora=vista, actor=ACTOR, actriz=ACTRIZ)
         plano.append({
             "n": len(plano) + 1,
             "clase": clase,
@@ -184,6 +192,150 @@ def planear(duracion: float, bpm: float = 95, letra: list | None = None, hora: t
         if inicio >= duracion - 0.01:
             break
     return plano
+
+
+# ───────────────────────── Plano sobre la letra ─────────────────────────
+# Qué tomas van en cada parte de la canción. «canta»: sobre las líneas cantadas (primer plano del cantante, con labios);
+# «corte»: tomas de apoyo dentro de una línea larga; «hueco»: partes sin voz (intro, puentes instrumentales, final).
+POR_SECCION = {
+    "intro": {"canta": ["copiloto_tararea"], "corte": ["detalle_rueda"], "hueco": ["dron_apertura", "sube_al_auto", "detalle_rueda"]},
+    "verse": {"canta": ["canta_volante"], "corte": ["manos_volante", "retrovisor", "copiloto_tararea", "detalle_rueda"],
+              "hueco": ["detalle_rueda", "manos_volante"]},
+    "pre-chorus": {"canta": ["canta_volante", "canta_capo"], "corte": ["copiloto_tararea", "recuerdo_byn", "retrovisor"], "hueco": ["recuerdo_byn"]},
+    "chorus": {"canta": ["canta_campo", "canta_capo", "canta_volante"], "corte": ["dron_atardecer", "guitarra", "maquina_ritmos"],
+               "hueco": ["dron_atardecer", "guitarra"]},
+    "bridge": {"canta": ["canta_noche"], "corte": ["recuerdo_byn", "fantasma", "copiloto_tararea"], "hueco": ["fantasma", "recuerdo_byn"]},
+    "outro": {"canta": ["canta_noche"], "corte": ["fantasma", "dron_atardecer"], "hueco": ["fantasma", "dron_atardecer"]},
+}
+HUECO_ENTRE_SECCIONES = ["dron_atardecer", "detalle_rueda", "guitarra", "maquina_ritmos", "dron_apertura"]
+NOCHE_DESDE = 0.62  # a partir de esta parte de la canción ya es de noche
+
+
+def _seccion(linea: dict, i: int) -> str:
+    s = (linea.get("seccion") or "").lower().strip("[] ")
+    for clave in POR_SECCION:
+        if s.startswith(clave):
+            return clave
+    if s.startswith("pre"):
+        return "pre-chorus"
+    return "verse" if (i // 4) % 2 == 0 else "chorus"
+
+
+def _es_tarareo(texto: str) -> bool:
+    import re
+    t = texto.lower().strip()
+    return t.startswith("(") or bool(re.fullmatch(r"[\s,.\-…()]*((m+h*m*|a+h*|o+h+|u+h+|la+|na+)[\s,.\-…()]*)+", t))
+
+
+def planear_por_letra(duracion: float, bpm: float, letra: list, hora: tuple[float, float] = (0.05, 1.0), semilla: int = 11) -> list[dict]:
+    """Plano que sigue la canción: un primer plano cantando sobre cada línea, la copiloto en los tarareos,
+    tomas de paisaje e instrumentos en las partes sin voz y el cierre al final. Los cortes caen en los compases."""
+    compas = 4 * 60.0 / (bpm or 95)
+
+    def q(t):  # al compás más cercano
+        return max(0.0, min(duracion, round(t / compas) * compas))
+
+    lineas = sorted([l for l in letra if l.get("texto", "").strip() and l.get("fin", 0) > l.get("inicio", 0)], key=lambda l: l["inicio"])
+    tramos = []  # (desde, hasta, tipo, seccion, texto)
+    cursor = 0.0
+    for i, l in enumerate(lineas):
+        sec = _seccion(l, i)
+        ini = q(l["inicio"])
+        if ini - cursor >= compas * 0.75:
+            tramos.append((cursor, ini, "hueco", sec if cursor > 0 else "intro", ""))
+            cursor = ini
+        siguiente = q(lineas[i + 1]["inicio"]) if i + 1 < len(lineas) else None
+        fin_canto = max(q(l["fin"]), cursor + compas)
+        if siguiente is not None and siguiente - fin_canto < compas * 1.5:
+            fin_canto = max(siguiente, cursor + compas)  # la toma dura hasta la línea siguiente (incluye la respiración)
+        fin_canto = min(fin_canto, duracion)
+        if fin_canto > cursor:
+            tramos.append((cursor, fin_canto, "tarareo" if _es_tarareo(l["texto"]) else "canta", sec, l["texto"]))
+            cursor = fin_canto
+    if duracion - cursor > 0.3:
+        tramos.append((cursor, duracion, "hueco", "outro", ""))
+
+    contadores: dict = {}
+    ultima = [None]
+
+    def elegir(lista, clave, f):
+        lista = [c for c in lista if not (TOMAS[c].get("hora_fija", 0) > 0.8 and f < NOCHE_DESDE - 0.1)] or lista
+        k = contadores.get(clave, 0)
+        for d in range(len(lista)):
+            c = lista[(k + d) % len(lista)]
+            if c != ultima[0] or len(lista) == 1:
+                contadores[clave] = k + d + 1
+                ultima[0] = c
+                return c
+        return lista[0]
+
+    plano = []
+    linea_en_seccion: dict = {}
+    for desde, hasta, tipo, sec, texto in tramos:
+        if tipo == "canta":
+            j = linea_en_seccion.get(sec, 0)
+            linea_en_seccion[sec] = j + 1
+            if j % 3 == 2:
+                tipo = "apoyo"  # una de cada tres líneas va con tomas de apoyo, para que no sea siempre el mismo plano
+        # trozos de hasta 2 compases (~5 s): lo que un modelo de video genera de una vez
+        n_trozos = max(1, math.ceil((hasta - desde) / (2 * compas) - 0.15))
+        bordes = [desde + (hasta - desde) * k / n_trozos for k in range(n_trozos + 1)]
+        for k in range(n_trozos):
+            a, b = bordes[k], bordes[k + 1]
+            f = a / max(duracion, 1e-6)
+            pools = POR_SECCION[sec]
+            if tipo == "canta":
+                clase = elegir(pools["canta"] if k % 2 == 0 else pools["corte"], f"{sec}:{'c' if k % 2 == 0 else 'x'}", f)
+                if clase == "canta_volante" and f >= NOCHE_DESDE:
+                    clase = "canta_noche"
+            elif tipo == "apoyo":
+                clase = elegir(pools["corte"], f"{sec}:x", f)
+            elif tipo == "tarareo" and sec == "intro" and not any(t["clase"] == "sube_al_auto" for t in plano):
+                clase = "sube_al_auto"  # al empezar, él camina hacia el auto y se sube
+            elif tipo == "tarareo":
+                clase = elegir(["copiloto_tararea", "fantasma"] if f >= NOCHE_DESDE else ["copiloto_tararea", "recuerdo_byn"], "tarareo", f)
+            elif sec == "intro" and not plano:
+                clase = "dron_apertura"
+            else:
+                clase = elegir(pools["hueco"] if sec in ("intro", "outro", "bridge") else HUECO_ENTRE_SECCIONES, f"{sec}:h", f)
+            plano.append(_toma(clase, a, b, len(plano) + 1, semilla, hora, duracion, texto))
+    # el final siempre es el cierre
+    if plano and plano[-1]["clase"] != "cierre":
+        ult = plano[-1]
+        if ult["hasta"] - ult["desde"] >= 2 * compas and not ult["canta"]:
+            plano[-1] = _toma("cierre", ult["desde"], ult["hasta"], ult["n"], semilla, hora, duracion, "")
+        elif duracion - ult["desde"] > compas:
+            mitad = max(ult["desde"] + compas * 0.75, duracion - 2 * compas)
+            ult["hasta"] = round(mitad, 3)
+            plano.append(_toma("cierre", mitad, duracion, len(plano) + 1, semilla, hora, duracion, ""))
+    return plano
+
+
+def _toma(clase: str, desde: float, hasta: float, n: int, semilla: int, hora: tuple[float, float], duracion: float, texto: str) -> dict:
+    d = TOMAS[clase]
+    h = d.get("hora_fija", hora[0] + (hora[1] - hora[0]) * (desde / max(duracion, 1e-6)))
+    vista = hora_texto(h)
+    imagen = d["imagen"].format(auto=AUTO, hora=vista, actor=ACTOR, actriz=ACTRIZ)
+    return {"n": n, "clase": clase, "desde": round(desde, 3), "hasta": round(hasta, 3), "personaje": d.get("personaje"),
+            "encuadre": d.get("encuadre"), "imagen": f"{imagen}, {ESTILO_FOTO}", "mueve": f"{d['mueve']}, {vista}, {MOVIMIENTO_COMUN}",
+            "canta": bool(d.get("canta")), "grado": d.get("grado") or grado_por_hora(h), "hora": round(h, 2),
+            "semilla": semilla + n * 7, "linea": texto}
+
+
+def letra_sirve(letra: list | None, duracion: float) -> bool:
+    """¿La letra tiene tiempos reales que cubren buena parte de la canción?"""
+    con_tiempo = [l for l in (letra or []) if l.get("fin", 0) > l.get("inicio", 0)]
+    if len(con_tiempo) < 3:
+        return False
+    tramo = max(l["fin"] for l in con_tiempo) - min(l["inicio"] for l in con_tiempo)
+    return tramo >= 0.4 * duracion and max(l["fin"] for l in con_tiempo) <= duracion + 2
+
+
+def planear_auto(duracion: float, bpm: float = 95, letra: list | None = None, semilla: int = 11, ritmo: str = "auto") -> list[dict]:
+    """Sigue la letra si tiene tiempos; si no, reparte la historia por compases."""
+    if letra_sirve(letra, duracion):
+        return planear_por_letra(duracion, bpm, letra, semilla=semilla)
+    return planear(duracion, bpm, letra, semilla=semilla, ritmo=ritmo)
 
 
 def letra_en(plano_toma: dict, letra: list | None) -> str:
@@ -259,7 +411,9 @@ GRADOS = {
     "crepusculo": "colorbalance=rs=.03:bs=.06:rm=.06:bm=.02:rh=.05:bh=-.02,eq=contrast=1.08:saturation=1.02:gamma=.95",
     "noche": "colorbalance=rs=-.05:gs=.01:bs=.09:rm=-.02:bm=.05:rh=.06:gh=.02:bh=-.04,eq=contrast=1.1:saturation=.92:gamma=.92",
     "byn": "hue=s=0,eq=contrast=1.18:brightness=.01:gamma=1.02",
-    "fantasma": "colorbalance=bs=.12:gs=.04:bm=.08,eq=contrast=1.05:saturation=.6:brightness=.02,gblur=sigma=.8",
+    # fantasma: frío, desaturado y con un brillo difuso encima (la imagen se «funde» con la luz)
+    "fantasma": ("colorbalance=bs=.12:gs=.04:bm=.08,eq=contrast=1.05:saturation=.55:brightness=.02,format=gbrp,split[fa][fb];"
+                 "[fb]gblur=sigma=18[fg];[fa][fg]blend=all_mode=screen:all_opacity=0.55,format=yuv420p"),
 }
 
 
@@ -277,11 +431,12 @@ def duracion_de(archivo: str | Path) -> float:
 
 def montar(plano: list[dict], clips: dict[int, str | Path], audio: str | Path, salida: str | Path,
            formato: str = "horizontal", fps: int = 24, franjas: bool = True, grano: int = 7,
-           carpeta: str | Path | None = None, crf: int = 20) -> Path:
+           carpeta: str | Path | None = None, crf: int = 20, resolucion: int = 1080) -> Path:
     """Une las tomas en un video con la canción.
 
     clips: número de toma → archivo de video. Una toma sin clip queda en negro (para ver el ritmo igual)."""
-    W, H = (1920, 1080) if formato == "horizontal" else (1080, 1920)
+    corto, largo = resolucion, round(resolucion * 16 / 9 / 2) * 2  # 1080 → 1920x1080, 720 → 1280x720
+    W, H = (largo, corto) if formato == "horizontal" else (corto, largo)
     carpeta = Path(carpeta or Path(salida).parent / "montaje")
     carpeta.mkdir(parents=True, exist_ok=True)
     partes = []
@@ -348,3 +503,60 @@ def hoja_de_contactos(imagenes: list[str | Path], salida: str | Path, columnas: 
         hoja.paste(im.resize((ancho, alto), Image.LANCZOS), ((k % columnas) * ancho, (k // columnas) * alto))
     hoja.save(salida, quality=90)
     return Path(salida)
+
+
+# ───────────────────────── Video rápido (3 pasos) ─────────────────────────
+# FastWan 2.2 (FastVideo, Apache 2.0) es Wan 2.2 5B destilado para generar en 3 pasos y sin «guía doble» (CFG):
+# unas 20 veces menos trabajo que 30 pasos con CFG. Usa estos tiempos fijos del ruido.
+PASOS_DMD = (1000, 757, 522)
+
+
+def programador_dmd(pasos: tuple[int, ...] = PASOS_DMD):
+    """Programador de ruido para FastWan: en cada paso predice la imagen limpia y la vuelve a ensuciar al nivel siguiente."""
+    import torch
+    from diffusers import FlowMatchEulerDiscreteScheduler
+
+    class ProgramadorDMD(FlowMatchEulerDiscreteScheduler):
+        def set_timesteps(self, num_inference_steps=None, device=None, **_):
+            t = torch.tensor(pasos, dtype=torch.float32)
+            self.timesteps = t.to(device)
+            self.sigmas = torch.cat([t / 1000.0, torch.zeros(1)]).to(device)
+            self.num_inference_steps = len(pasos)
+            self._step_index = None
+            self._begin_index = None
+
+    return ProgramadorDMD(num_train_timesteps=1000, shift=1.0, stochastic_sampling=True)
+
+
+# ───────────────────────── Fotos de entrenamiento ─────────────────────────
+# Lugares, luces y encuadres para crear fotos variadas del personaje (cuaderno 6).
+# La cara se conserva del recorte; cambia todo lo demás, así la IA aprende la cara y no el fondo de estudio.
+LUGARES_ENTRENAMIENTO = [
+    "in the driver seat of a {auto} with the top down, desert highway behind",
+    "leaning on the door of a parked {auto} on a gravel roadside",
+    "on an empty desert highway with mountains in the distance",
+    "in a field of tall dry grass",
+    "on a city street at night with neon signs and wet asphalt",
+    "inside a dim recording studio with warm lamps",
+    "on a rooftop at dusk with the city skyline behind",
+    "in the passenger seat of a {auto}, wind in the hair",
+    "at a roadside gas station at night under fluorescent lights",
+    "on a beach boardwalk with the ocean behind",
+]
+LUCES_ENTRENAMIENTO = [
+    "warm golden hour sunlight", "soft overcast daylight", "orange sunset backlight", "blue hour twilight",
+    "night, warm dashboard glow", "harsh midday sun", "neon pink and blue light", "soft window light",
+]
+ENCUADRES_ENTRENAMIENTO = ["primer_plano", "medio_izquierda", "medio_derecha", "cuerpo_izquierda", "cuerpo_derecha"]
+
+
+def variaciones_entrenamiento(cantidad: int, semilla: int = 3) -> list[dict]:
+    """Combinaciones repetibles de lugar, luz y encuadre (sin azar del sistema)."""
+    salida = []
+    for k in range(cantidad):
+        a = (k * 7 + semilla) % len(LUGARES_ENTRENAMIENTO)
+        b = (k * 5 + semilla * 3) % len(LUCES_ENTRENAMIENTO)
+        c = (k * 3 + semilla) % len(ENCUADRES_ENTRENAMIENTO)
+        salida.append({"lugar": LUGARES_ENTRENAMIENTO[a].format(auto=AUTO), "luz": LUCES_ENTRENAMIENTO[b],
+                       "encuadre": ENCUADRES_ENTRENAMIENTO[c], "semilla": semilla * 1000 + k})
+    return salida
