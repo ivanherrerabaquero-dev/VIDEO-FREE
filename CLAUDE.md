@@ -27,7 +27,7 @@ Estudio web de videos musicales con **código propio**. El dueño no quiere depe
 - `js/app.js` — la interfaz.
 - `proyectos/*.json` — cada video: datos, escenas, letra y análisis de voz. `proyectos/indice.json` lista los proyectos.
 - `medios/` — personajes, audio y clips. `ideas/ideas.md` — libreta del dueño.
-- `colab/` — cuadernos de IA (canción con voz, mi voz con RVC, video con Wan, labios con LatentSync) y `comun.py` (GitHub, Drive, audio, alineación de letra). Los cuadernos se generan con celdas JSON; valida su sintaxis antes de subirlos.
+- `colab/` — cuadernos de IA (1 canción con voz, 2 mi voz con RVC, 3 video con Wan, 4 labios con LatentSync, 5 director del video completo, 6 entrenar personaje con LoRA), `comun.py` (GitHub, Drive, audio, alineación de letra con faster-whisper o transformers) y `director.py` (plano de tomas por compases, fotograma con recorte, montaje con ffmpeg; se puede probar sin GPU). Los cuadernos se generan con celdas JSON; valida su sintaxis antes de subirlos.
 
 ## Cómo agregar una escena nueva
 

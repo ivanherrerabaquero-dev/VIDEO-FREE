@@ -131,6 +131,14 @@ def a_drive(local: str | Path, nombre: str | None = None) -> Path | None:
     return destino
 
 
+def en_drive(nombre: str) -> Path | None:
+    """El archivo de Drive (VIDEO-FREE/<nombre>) si ya existe: sirve para retomar un trabajo largo tras una desconexión."""
+    if not _drive:
+        return None
+    f = _drive / nombre
+    return f if f.exists() and f.stat().st_size > 0 else None
+
+
 def bajar(camino_repo: str, local: str | Path | None = None) -> Path:
     """Descarga un archivo del repo a la carpeta de trabajo."""
     datos = leer(camino_repo)
@@ -252,10 +260,40 @@ def alinear_letra(palabras: list[dict], lineas: list[str]) -> list[dict]:
     return salida
 
 
-def tiempos_de_palabras(audio: str | Path, idioma: str = "es", modelo: str = "openai/whisper-large-v3-turbo") -> list[dict]:
-    """Whisper (con transformers, sobre el mismo PyTorch y CUDA del resto) con tiempos por palabra sobre la voz cantada."""
-    import gc
+def _cargar_cuda_de_pip() -> None:
+    """faster-whisper (CTranslate2) busca libcublas.so.12 y cuDNN 9. Los instala pip (paquetes de NVIDIA)
+    y se cargan aquí antes de importar ctranslate2, sin tocar LD_LIBRARY_PATH."""
+    import ctypes
+    import glob
+    import site
+    rutas = []
+    for base in site.getsitepackages():
+        rutas += sorted(glob.glob(f"{base}/nvidia/cublas/lib/libcublas*.so*")) + sorted(glob.glob(f"{base}/nvidia/cudnn/lib/libcudnn*.so*"))
+    for r in rutas:
+        try:
+            ctypes.CDLL(r, mode=ctypes.RTLD_GLOBAL)
+        except OSError:
+            pass
 
+
+def _palabras_faster_whisper(audio: str | Path, idioma: str, pista: str | None) -> list[dict]:
+    """faster-whisper (MIT, SYSTRAN): más rápido y con filtro de voz (VAD). Se instala al usarlo."""
+    import importlib.util
+    if importlib.util.find_spec("faster_whisper") is None:
+        sh('pip install -q "faster-whisper>=1.1" nvidia-cublas-cu12 "nvidia-cudnn-cu12==9.*"')
+    _cargar_cuda_de_pip()
+    from faster_whisper import WhisperModel  # type: ignore
+    g = gpu()
+    modelo = WhisperModel("large-v3-turbo", device="cuda" if g else "cpu", compute_type="float16" if g else "int8")
+    segmentos, _ = modelo.transcribe(str(audio), language=idioma, word_timestamps=True, vad_filter=True,
+                                     initial_prompt=pista, condition_on_previous_text=False, beam_size=5)
+    palabras = [{"p": w.word.strip(), "inicio": float(w.start), "fin": float(w.end)}
+                for seg in segmentos for w in (seg.words or []) if w.word.strip()]
+    del modelo
+    return palabras
+
+
+def _palabras_transformers(audio: str | Path, idioma: str, modelo: str) -> list[dict]:
     import numpy as np
     import torch
     from transformers import pipeline  # type: ignore
@@ -276,8 +314,32 @@ def tiempos_de_palabras(audio: str | Path, idioma: str = "es", modelo: str = "op
             continue
         palabras.append({"p": texto, "inicio": float(a), "fin": float(b if b is not None else a + 0.3)})
     del asr
+    return palabras
+
+
+def tiempos_de_palabras(audio: str | Path, idioma: str = "es", modelo: str = "openai/whisper-large-v3-turbo",
+                        letra: str | None = None, motor: str = "auto") -> list[dict]:
+    """Tiempos por palabra sobre la voz cantada.
+
+    motor "auto": primero faster-whisper (más rápido, con VAD y con la letra como pista);
+    si algo falla, Whisper con transformers sobre el mismo PyTorch del resto."""
+    import gc
+
+    import torch
+    pista = " ".join((letra or "").split())[:800] or None
+    palabras = []
+    if motor in ("auto", "faster-whisper"):
+        try:
+            palabras = _palabras_faster_whisper(audio, idioma, pista)
+            print(f"faster-whisper: {len(palabras)} palabras")
+        except Exception as e:  # noqa: BLE001
+            if motor == "faster-whisper":
+                raise
+            print("faster-whisper no funcionó aquí, uso transformers:", str(e)[:200])
+    if not palabras:
+        palabras = _palabras_transformers(audio, idioma, modelo)
     gc.collect()
-    if g:
+    if gpu():
         torch.cuda.empty_cache()
     return palabras
 

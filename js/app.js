@@ -435,6 +435,8 @@ const CUADERNOS = [
   ["2_mi_voz_rvc.ipynb", "2 · Que cante tu voz", "Entrena un modelo con 10 minutos o más de tu voz y convierte la voz de la canción a tu timbre (RVC).", "T4 gratis sirve"],
   ["3_video_ia.ipynb", "3 · Tomas de video con IA", "Crea tomas realistas desde texto o desde una imagen (Wan 2.2 / 2.1) y las pone en las escenas.", "L4 o A100 para 720p e imagen → video; T4 para 480p"],
   ["4_labios_ia.ipynb", "4 · Labios sincronizados", "Mueve la boca del cantante en una toma para que cante la parte de la canción de esa escena (LatentSync).", "L4 o A100 (T4 con menos resolución)"],
+  ["5_director_video.ipynb", "5 · Director: el video completo", "Escribe la historia sobre los compases, crea fotogramas fotorrealistas con la cara exacta de tus personajes, les da movimiento (subirse al auto, manejar, cantar), sincroniza los labios y monta todo con la canción y color de cine.", "A100 recomendada; L4 sirve; T4 experimental a 480p"],
+  ["6_entrenar_personaje.ipynb", "6 · Entrenar tu personaje", "Enseña a la IA tu cara (o la de tu actriz) con tus fotos para crearlos en cualquier pose: de espaldas, de lado, de lejos.", "T4 gratis sirve"],
 ];
 function pintarCuadernos() {
   const c = gh.config(), dueno = c.dueno || "ivanherrerabaquero-dev", repo = c.repo || "VIDEO-FREE", rama = c.rama || "main";
