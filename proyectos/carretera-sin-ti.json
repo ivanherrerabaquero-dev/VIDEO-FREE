@@ -1,8 +1,8 @@
 {
   "titulo": "Carretera Sin Ti",
   "artista": "Tu Nombre Artístico",
-  "audio": "demo",
-  "duracion": 32,
+  "audio": "medios/audio/carretera-sin-ti_ia.mp3",
+  "duracion": 32.0,
   "bpm": 95,
   "fps": 30,
   "vozReactiva": true,
@@ -87,48 +87,48 @@
   ],
   "letra": [
     {
-      "inicio": 5.2,
-      "fin": 7.6,
+      "inicio": 0.0,
+      "fin": 3.58,
       "texto": "Voy rodando sin rumbo por la carretera"
     },
     {
-      "inicio": 7.7,
-      "fin": 10.1,
+      "inicio": 3.68,
+      "fin": 7.02,
       "texto": "buscando tu sombra en cada frontera"
     },
     {
-      "inicio": 10.2,
-      "fin": 12.9,
+      "inicio": 7.12,
+      "fin": 10.37,
       "texto": "el sol se despide y tú no regresas"
     },
     {
-      "inicio": 13.6,
-      "fin": 16.0,
+      "inicio": 10.47,
+      "fin": 13.71,
       "texto": "me quedan tus besos y tus promesas"
     },
     {
-      "inicio": 16.1,
-      "fin": 18.9,
+      "inicio": 13.81,
+      "fin": 16.98,
       "texto": "en el asiento vacío todavía estás"
     },
     {
-      "inicio": 19.8,
-      "fin": 22.2,
+      "inicio": 17.08,
+      "fin": 20.41,
       "texto": "De día te busco, de noche te nombro"
     },
     {
-      "inicio": 22.3,
-      "fin": 24.7,
+      "inicio": 20.51,
+      "fin": 23.68,
       "texto": "y tu silueta se pierde en el humo"
     },
     {
-      "inicio": 24.8,
-      "fin": 27.2,
+      "inicio": 23.78,
+      "fin": 25.69,
       "texto": "sé que ya no estás"
     },
     {
-      "inicio": 27.8,
-      "fin": 30.6,
+      "inicio": 25.79,
+      "fin": 27.78,
       "texto": "pero sigo manejando"
     }
   ],
@@ -148,7 +148,7 @@
     }
   },
   "canto": {
-    "activo": true,
+    "activo": false,
     "motor": "sintetica",
     "timbre": "masculina",
     "melodia": "compuesta",
@@ -156,5 +156,15 @@
     "volumen": 0.85,
     "aire": 0.08,
     "afinar": true
+  },
+  "audio_anterior": "medios/audio/carretera-sin-ti_ia.mp3",
+  "ia": {
+    "cancion": {
+      "modelo": "ACE-Step 1.5 XL Turbo",
+      "estilo": "reggaeton, dembow rhythm, latin urban, deep 808 bass, emotional, melodic, modern production, male vocals, spanish lyrics, high quality studio mix",
+      "semilla": 7,
+      "voz": "medios/audio/carretera-sin-ti_voz_ia.mp3",
+      "instrumental": "medios/audio/carretera-sin-ti_instrumental_ia.mp3"
+    }
   }
 }

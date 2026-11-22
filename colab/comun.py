@@ -131,6 +131,14 @@ def a_drive(local: str | Path, nombre: str | None = None) -> Path | None:
     return destino
 
 
+def en_drive(nombre: str) -> Path | None:
+    """El archivo de Drive (VIDEO-FREE/<nombre>) si ya existe: sirve para retomar un trabajo largo tras una desconexión."""
+    if not _drive:
+        return None
+    f = _drive / nombre
+    return f if f.exists() and f.stat().st_size > 0 else None
+
+
 def bajar(camino_repo: str, local: str | Path | None = None) -> Path:
     """Descarga un archivo del repo a la carpeta de trabajo."""
     datos = leer(camino_repo)
@@ -217,6 +225,18 @@ def alinear_letra(palabras: list[dict], lineas: list[str]) -> list[dict]:
             w = palabras[bloque.a + k]
             tiempos[bloque.b + k] = (w["inicio"], w["fin"])
     conocidos = [i for i, t in enumerate(tiempos) if t]
+    if len(conocidos) < max(3, 0.35 * len(letra)) and palabras:
+        # Whisper entendió poco de lo que se canta: reparte la letra a lo largo del tramo cantado, según el largo de cada línea
+        print(f"Aviso: solo reconocí {len(conocidos)} de {len(letra)} palabras; reparto la letra en el tramo cantado. Ajusta los tiempos en el portal.")
+        t0, t1 = palabras[0]["inicio"], palabras[-1]["fin"]
+        pesos = [len(l) + 6 for l in lineas]
+        total, acum, salida = sum(pesos), 0, []
+        for l, w in zip(lineas, pesos):
+            a = t0 + (t1 - t0) * acum / total
+            acum += w
+            b = t0 + (t1 - t0) * acum / total - 0.1
+            salida.append({"inicio": round(a, 2), "fin": round(max(a + 0.3, b), 2), "texto": l})
+        return salida
     if not conocidos:
         raise ValueError("No pude alinear la letra con lo que se canta. ¿Es la misma letra?")
     for i, t in enumerate(tiempos):  # rellena palabras que Whisper no entendió
@@ -240,14 +260,88 @@ def alinear_letra(palabras: list[dict], lineas: list[str]) -> list[dict]:
     return salida
 
 
-def tiempos_de_palabras(audio: str | Path, idioma: str = "es", modelo: str = "large-v3") -> list[dict]:
-    """Whisper (faster-whisper) con tiempos por palabra sobre la voz cantada."""
-    from faster_whisper import WhisperModel  # type: ignore
+def _cargar_cuda_de_pip() -> None:
+    """faster-whisper (CTranslate2) busca libcublas.so.12 y cuDNN 9. Los instala pip (paquetes de NVIDIA)
+    y se cargan aquí antes de importar ctranslate2, sin tocar LD_LIBRARY_PATH."""
+    import ctypes
+    import glob
+    import site
+    rutas = []
+    for base in site.getsitepackages():
+        rutas += sorted(glob.glob(f"{base}/nvidia/cublas/lib/libcublas*.so*")) + sorted(glob.glob(f"{base}/nvidia/cudnn/lib/libcudnn*.so*"))
+    for r in rutas:
+        try:
+            ctypes.CDLL(r, mode=ctypes.RTLD_GLOBAL)
+        except OSError:
+            pass
 
+
+def _palabras_faster_whisper(audio: str | Path, idioma: str, pista: str | None) -> list[dict]:
+    """faster-whisper (MIT, SYSTRAN): más rápido y con filtro de voz (VAD). Se instala al usarlo."""
+    import importlib.util
+    if importlib.util.find_spec("faster_whisper") is None:
+        sh('pip install -q "faster-whisper>=1.1" nvidia-cublas-cu12 "nvidia-cudnn-cu12==9.*"')
+    _cargar_cuda_de_pip()
+    from faster_whisper import WhisperModel  # type: ignore
     g = gpu()
-    m = WhisperModel(modelo, device="cuda" if g else "cpu", compute_type="float16" if g else "int8")
-    segmentos, _ = m.transcribe(str(audio), language=idioma, word_timestamps=True, vad_filter=True)
-    return [{"p": w.word.strip(), "inicio": float(w.start), "fin": float(w.end)} for s in segmentos for w in (s.words or []) if w.word.strip()]
+    modelo = WhisperModel("large-v3-turbo", device="cuda" if g else "cpu", compute_type="float16" if g else "int8")
+    segmentos, _ = modelo.transcribe(str(audio), language=idioma, word_timestamps=True, vad_filter=True,
+                                     initial_prompt=pista, condition_on_previous_text=False, beam_size=5)
+    palabras = [{"p": w.word.strip(), "inicio": float(w.start), "fin": float(w.end)}
+                for seg in segmentos for w in (seg.words or []) if w.word.strip()]
+    del modelo
+    return palabras
+
+
+def _palabras_transformers(audio: str | Path, idioma: str, modelo: str) -> list[dict]:
+    import numpy as np
+    import torch
+    from transformers import pipeline  # type: ignore
+
+    # El audio lo decodifica ffmpeg (16 kHz, mono): así no dependemos de la versión de PyAV que traiga Colab
+    crudo = subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(audio), "-f", "f32le", "-ac", "1", "-ar", "16000", "-"],
+                           capture_output=True, check=True).stdout
+    muestras = np.frombuffer(crudo, dtype=np.float32).copy()
+    g = gpu()
+    asr = pipeline("automatic-speech-recognition", model=modelo, torch_dtype=torch.float16 if g else torch.float32, device=0 if g else -1)
+    r = asr({"raw": muestras, "sampling_rate": 16000}, return_timestamps="word", chunk_length_s=30, batch_size=8,
+            generate_kwargs={"language": idioma, "task": "transcribe"})
+    palabras = []
+    for ch in r.get("chunks", []):
+        a, b = ch.get("timestamp") or (None, None)
+        texto = (ch.get("text") or "").strip()
+        if a is None or not texto:
+            continue
+        palabras.append({"p": texto, "inicio": float(a), "fin": float(b if b is not None else a + 0.3)})
+    del asr
+    return palabras
+
+
+def tiempos_de_palabras(audio: str | Path, idioma: str = "es", modelo: str = "openai/whisper-large-v3-turbo",
+                        letra: str | None = None, motor: str = "auto") -> list[dict]:
+    """Tiempos por palabra sobre la voz cantada.
+
+    motor "auto": primero faster-whisper (más rápido, con VAD y con la letra como pista);
+    si algo falla, Whisper con transformers sobre el mismo PyTorch del resto."""
+    import gc
+
+    import torch
+    pista = " ".join((letra or "").split())[:800] or None
+    palabras = []
+    if motor in ("auto", "faster-whisper"):
+        try:
+            palabras = _palabras_faster_whisper(audio, idioma, pista)
+            print(f"faster-whisper: {len(palabras)} palabras")
+        except Exception as e:  # noqa: BLE001
+            if motor == "faster-whisper":
+                raise
+            print("faster-whisper no funcionó aquí, uso transformers:", str(e)[:200])
+    if not palabras:
+        palabras = _palabras_transformers(audio, idioma, modelo)
+    gc.collect()
+    if gpu():
+        torch.cuda.empty_cache()
+    return palabras
 
 
 def separar_voz(cancion: str | Path, salida: str | Path = TRABAJO / "separado") -> tuple[Path, Path]:
