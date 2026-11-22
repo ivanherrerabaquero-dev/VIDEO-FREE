@@ -14,11 +14,10 @@ Los cuadernos de esta carpeta (`colab/`) son la única excepción. Descargan y e
 | RVC (Retrieval-based Voice Conversion) | Tu timbre | MIT |
 | Modelos base de RVC (lj1995) | Entrenar tu voz | MIT |
 | Wan 2.2 TI2V-5B / Wan 2.1 T2V-1.3B | Tomas de video | Apache 2.0 |
-| Wan 2.2 TI2V-5B GGUF (QuantStack) | Video en T4 (comprimido) | Apache 2.0 |
-| FastWan 2.2 TI2V-5B (FastVideo) y su GGUF (Green-Sky) | Video rápido en 3 pasos | Apache 2.0 |
+| FastWan 2.2 TI2V-5B (FastVideo) | Video rápido en 3 pasos | Apache 2.0 |
 | RealVisXL 5.0, 5.0 Lightning y 4.0 inpainting (base SDXL) | Fotogramas clave fotorrealistas | OpenRAIL++ |
 | Script DreamBooth LoRA SDXL (Diffusers) | Entrenar tu personaje | Apache 2.0 |
-| PEFT, bitsandbytes, gguf | Entrenar y cargar modelos | Apache 2.0 / MIT / MIT |
+| PEFT, bitsandbytes | Entrenar y cargar modelos | Apache 2.0 / MIT |
 | LatentSync (código) | Labios | Apache 2.0 |
 | LatentSync 1.5 / 1.6 (modelos) | Labios | OpenRAIL++ |
 | uv | Entornos aparte | Apache 2.0 / MIT |

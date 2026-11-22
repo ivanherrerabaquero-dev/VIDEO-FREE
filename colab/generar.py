@@ -23,9 +23,7 @@ import comun
 import director
 
 M5 = "Wan-AI/Wan2.2-TI2V-5B-Diffusers"
-GGUF = "https://huggingface.co/QuantStack/Wan2.2-TI2V-5B-GGUF/blob/main/Wan2.2-TI2V-5B-Q8_0.gguf"
 FAST = "FastVideo/FastWan2.2-TI2V-5B-FullAttn-Diffusers"
-GGUF_FAST = "https://huggingface.co/Green-Sky/FastWan2.2-TI2V-5B-FullAttn-GGUF/blob/main/FastWan2.2-TI2V-5B-q8_0.gguf"
 INPAINT = "OzzyGT/RealVisXL_V4.0_inpainting"
 REALVIS = "SG161222/RealVisXL_V5.0"
 REALVIS_RAPIDO = "SG161222/RealVisXL_V5.0_Lightning"
@@ -273,7 +271,7 @@ class Director:
     def animar(self) -> dict[int, Path]:
         import numpy as np
         import torch
-        from diffusers import AutoencoderKLWan, UniPCMultistepScheduler, WanImageToVideoPipeline, WanPipeline, WanTransformer3DModel
+        from diffusers import AutoencoderKLWan, UniPCMultistepScheduler, WanImageToVideoPipeline, WanTransformer3DModel
         from diffusers.utils import export_to_video
         from PIL import Image
         cfg = self.cfg
@@ -312,25 +310,12 @@ class Director:
             x, y = (img.width - aw) // 2, (img.height - ah) // 2
             return img.crop((x, y, x + aw, y + ah))
 
-        # textos → embeddings; el codificador UMT5 va en bfloat16 (en float16 puede dar NaN) y se libera antes del modelo de video
-        cod = WanPipeline.from_pretrained(M5, transformer=None, vae=None, torch_dtype=torch.bfloat16, device_map="cuda", low_cpu_mem_usage=True)
-        emb = {}
-        with torch.no_grad():
-            for t in faltan:
-                pe, ne = cod.encode_prompt(prompt=t["mueve"], negative_prompt=director.NEGATIVO_VIDEO,
-                                           do_classifier_free_guidance=not rapido, device="cuda", dtype=torch.bfloat16)
-                emb[t["n"]] = (pe.to(dtype), ne.to(dtype) if ne is not None else None)
-        del cod
-        gc.collect(); torch.cuda.empty_cache()
-
-        if grande:
-            transformer = WanTransformer3DModel.from_pretrained(FAST if rapido else M5, subfolder="transformer", torch_dtype=dtype,
-                                                                device_map="cuda", low_cpu_mem_usage=True)
-        else:
-            from diffusers import GGUFQuantizationConfig
-            transformer = WanTransformer3DModel.from_single_file(GGUF_FAST if rapido else GGUF, config=M5, subfolder="transformer",
-                                                                 quantization_config=GGUFQuantizationConfig(compute_dtype=dtype),
-                                                                 torch_dtype=dtype).to("cuda")
+        # textos → embeddings en un proceso aparte: al terminar suelta toda la memoria del codificador UMT5 (~11 GB)
+        emb = self._codificar([t["mueve"] for t in faltan], con_negativo=not rapido, dtype=dtype)
+        emb = dict(zip([t["n"] for t in faltan], emb))
+        # el modelo de video va directo a la GPU (5B parámetros: ~10 GB en 16 bits; cabe en una T4 de 15 GB)
+        transformer = WanTransformer3DModel.from_pretrained(FAST if rapido else M5, subfolder="transformer", torch_dtype=dtype,
+                                                            device_map="cuda", low_cpu_mem_usage=True)
         vae = AutoencoderKLWan.from_pretrained(M5, subfolder="vae", torch_dtype=torch.float32).to("cuda")
         try:
             vae.enable_tiling()
@@ -371,6 +356,33 @@ class Director:
         del pipe, transformer, vae, emb
         gc.collect(); torch.cuda.empty_cache()
         return self.tomas
+
+    def _codificar(self, textos: list[str], con_negativo: bool, dtype) -> list[tuple]:
+        """Convierte los textos en embeddings con UMT5 en un proceso aparte y los trae de vuelta."""
+        import subprocess
+        import sys
+
+        import torch
+        entrada, salida = self.local / "textos.json", self.local / "textos.pt"
+        entrada.write_text(json.dumps({"textos": textos, "negativo": director.NEGATIVO_VIDEO if con_negativo else None}))
+        r = subprocess.run([sys.executable, str(Path(__file__).resolve()), "--codificar", str(entrada), str(salida)],
+                           cwd=str(Path(__file__).resolve().parent))
+        if r.returncode != 0:
+            raise RuntimeError("Falló la codificación de los textos (mira el registro de arriba).")
+        datos = torch.load(salida)
+        return [(pe.to("cuda", dtype), ne.to("cuda", dtype) if ne is not None else None) for pe, ne in datos]
+
+    def adoptar_fotogramas(self, carpeta: str | Path) -> None:
+        """Toma fotogramas hechos por una versión anterior del cuaderno (clave_NN.png) y los suma a este video."""
+        from PIL import Image
+        for f in sorted(Path(carpeta).glob("clave_*.png")):
+            n = int(f.stem.split("_")[1])
+            if n in self.por_n and n not in self.claves:
+                destino = self.local / f"clave_{n:02d}.jpg"
+                Image.open(f).convert("RGB").save(destino, quality=92)
+                self._publicar(destino, f"Director: fotograma {n} de {self.carpeta}")
+                self.claves[n] = destino
+        print("Fotogramas adoptados:", sorted(self.claves))
 
     # ───────────── 3. labios ─────────────
     @staticmethod
@@ -529,7 +541,27 @@ class Director:
         print(f"Trabajador {self.cfg.trabajador}: terminado")
 
 
+def _codificar_aqui(entrada: str, salida: str) -> None:
+    """Modo --codificar: carga UMT5 en bfloat16 (en float16 puede dar NaN), codifica y guarda en CPU."""
+    import torch
+    from diffusers import WanPipeline
+    datos = json.loads(Path(entrada).read_text())
+    cod = WanPipeline.from_pretrained(M5, transformer=None, vae=None, torch_dtype=torch.bfloat16, device_map="cuda", low_cpu_mem_usage=True)
+    res = []
+    with torch.no_grad():
+        for texto in datos["textos"]:
+            pe, ne = cod.encode_prompt(prompt=texto, negative_prompt=datos["negativo"], do_classifier_free_guidance=datos["negativo"] is not None,
+                                       device="cuda", dtype=torch.bfloat16)
+            res.append((pe.float().cpu(), ne.float().cpu() if ne is not None else None))
+    torch.save(res, salida)
+    print(f"{len(res)} textos codificados")
+
+
 if __name__ == "__main__":
+    import sys
+    if len(sys.argv) == 4 and sys.argv[1] == "--codificar":
+        _codificar_aqui(sys.argv[2], sys.argv[3])
+        sys.exit(0)
     ap = argparse.ArgumentParser(description="Trabajador del director de VIDEO-FREE")
     ap.add_argument("--config", default="{}", help="JSON con las opciones de Config")
     ap.add_argument("--trabajador", type=int, default=1)
