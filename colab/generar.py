@@ -298,7 +298,7 @@ class Director:
             f = None if n in cfg.rehacer else self._traer(f"toma_{n:02d}.mp4", en_repo)
             if f:
                 self.tomas[n] = f
-            elif f"falla_{n:02d}.txt" not in en_repo and n in self.claves:
+            elif (n in cfg.rehacer or f"falla_{n:02d}.txt" not in en_repo) and n in self.claves:
                 faltan.append(t)
         print(f"Trabajador {cfg.trabajador}: {len(self.tomas)} tomas listas · {len(faltan)} por animar · {aw}x{ah}, {pasos} pasos")
         if not faltan:
@@ -329,13 +329,19 @@ class Director:
             n, dur = t["n"], t["hasta"] - t["desde"]
             pe, ne = emb[n]
             inicio = time.time()
-            try:
-                with torch.no_grad():
-                    cuadros = pipe(image=ajustar(Image.open(self.claves[n]).convert("RGB")), prompt_embeds=pe, negative_prompt_embeds=ne,
-                                   height=ah, width=aw, num_frames=director.cuadros_para(dur, 24), num_inference_steps=pasos,
-                                   guidance_scale=guia, generator=torch.Generator("cuda").manual_seed(t["semilla"])).frames[0]
-            except torch.cuda.OutOfMemoryError:
-                gc.collect(); torch.cuda.empty_cache()
+            cuadros = None
+            # si no cabe, se reintenta con menos cuadros: el montaje la estira en cámara lenta (hasta 1,6x)
+            for duracion_gen in (dur, dur / 1.6, dur / 2.5):
+                try:
+                    with torch.no_grad():
+                        cuadros = pipe(image=ajustar(Image.open(self.claves[n]).convert("RGB")), prompt_embeds=pe, negative_prompt_embeds=ne,
+                                       height=ah, width=aw, num_frames=director.cuadros_para(duracion_gen, 24), num_inference_steps=pasos,
+                                       guidance_scale=guia, generator=torch.Generator("cuda").manual_seed(t["semilla"])).frames[0]
+                    break
+                except torch.cuda.OutOfMemoryError:
+                    gc.collect(); torch.cuda.empty_cache()
+                    print(f"Toma {n}: {duracion_gen:.1f} s no caben en la GPU; pruebo con menos cuadros.")
+            if cuadros is None:
                 print(f"Toma {n}: no cupo en la GPU; entra como foto con movimiento de cámara.")
                 self._marca(f"falla_{n:02d}.txt", "sin memoria")
                 continue
