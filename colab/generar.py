@@ -1,7 +1,7 @@
 """
 VIDEO-FREE · motor del director (código propio).
 
-Lo usan el cuaderno 5 (Colab, una GPU) y el cuaderno 7 (Kaggle, dos GPU). Varias GPU pueden trabajar a la vez
+Lo usan el cuaderno 5 (Colab, una GPU) y colab/kaggle/kaggle_2_director.ipynb (Kaggle, dos GPU). Varias GPU pueden trabajar a la vez
 en el mismo video: cada una («trabajador») hace las tomas que le tocan y las sube a tu repo, en
 `medios/director/<video>/`. Cualquiera de ellas puede montar el video cuando todas las tomas estén listas.
 
