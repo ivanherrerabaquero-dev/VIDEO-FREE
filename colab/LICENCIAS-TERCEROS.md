@@ -9,7 +9,7 @@ Los cuadernos de esta carpeta (`colab/`) son la única excepción. Descargan y e
 | ACE-Step 1.5 XL Turbo | Canción con voz | MIT |
 | Diffusers (Hugging Face) | Ejecutar modelos | Apache 2.0 |
 | Demucs | Separar voz | MIT |
-| faster-whisper + Whisper large-v3 | Tiempos de la letra | MIT |
+| Whisper large-v3 turbo (transformers) | Tiempos de la letra | MIT |
 | RVC (Retrieval-based Voice Conversion) | Tu timbre | MIT |
 | Modelos base de RVC (lj1995) | Entrenar tu voz | MIT |
 | Wan 2.2 TI2V-5B / Wan 2.1 T2V-1.3B | Tomas de video | Apache 2.0 |

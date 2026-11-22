@@ -240,20 +240,34 @@ def alinear_letra(palabras: list[dict], lineas: list[str]) -> list[dict]:
     return salida
 
 
-def tiempos_de_palabras(audio: str | Path, idioma: str = "es", modelo: str = "large-v3") -> list[dict]:
-    """Whisper (faster-whisper) con tiempos por palabra sobre la voz cantada."""
-    from faster_whisper import WhisperModel  # type: ignore
+def tiempos_de_palabras(audio: str | Path, idioma: str = "es", modelo: str = "openai/whisper-large-v3-turbo") -> list[dict]:
+    """Whisper (con transformers, sobre el mismo PyTorch y CUDA del resto) con tiempos por palabra sobre la voz cantada."""
+    import gc
 
     import numpy as np
+    import torch
+    from transformers import pipeline  # type: ignore
 
     # El audio lo decodifica ffmpeg (16 kHz, mono): así no dependemos de la versión de PyAV que traiga Colab
     crudo = subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(audio), "-f", "f32le", "-ac", "1", "-ar", "16000", "-"],
                            capture_output=True, check=True).stdout
     muestras = np.frombuffer(crudo, dtype=np.float32).copy()
     g = gpu()
-    m = WhisperModel(modelo, device="cuda" if g else "cpu", compute_type="float16" if g else "int8")
-    segmentos, _ = m.transcribe(muestras, language=idioma, word_timestamps=True, vad_filter=True)
-    return [{"p": w.word.strip(), "inicio": float(w.start), "fin": float(w.end)} for s in segmentos for w in (s.words or []) if w.word.strip()]
+    asr = pipeline("automatic-speech-recognition", model=modelo, torch_dtype=torch.float16 if g else torch.float32, device=0 if g else -1)
+    r = asr({"raw": muestras, "sampling_rate": 16000}, return_timestamps="word", chunk_length_s=30, batch_size=8,
+            generate_kwargs={"language": idioma, "task": "transcribe"})
+    palabras = []
+    for ch in r.get("chunks", []):
+        a, b = ch.get("timestamp") or (None, None)
+        texto = (ch.get("text") or "").strip()
+        if a is None or not texto:
+            continue
+        palabras.append({"p": texto, "inicio": float(a), "fin": float(b if b is not None else a + 0.3)})
+    del asr
+    gc.collect()
+    if g:
+        torch.cuda.empty_cache()
+    return palabras
 
 
 def separar_voz(cancion: str | Path, salida: str | Path = TRABAJO / "separado") -> tuple[Path, Path]:
