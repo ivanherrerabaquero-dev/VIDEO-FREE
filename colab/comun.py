@@ -131,6 +131,15 @@ def a_drive(local: str | Path, nombre: str | None = None) -> Path | None:
     return destino
 
 
+def carpeta_drive(sub: str) -> Path | None:
+    """Una carpeta dentro de VIDEO-FREE/ en Drive (la crea). None si Drive no está montado."""
+    if not _drive:
+        return None
+    c = _drive / sub
+    c.mkdir(parents=True, exist_ok=True)
+    return c
+
+
 def en_drive(nombre: str) -> Path | None:
     """El archivo de Drive (VIDEO-FREE/<nombre>) si ya existe: sirve para retomar un trabajo largo tras una desconexión."""
     if not _drive:

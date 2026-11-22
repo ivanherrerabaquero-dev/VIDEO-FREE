@@ -348,3 +348,60 @@ def hoja_de_contactos(imagenes: list[str | Path], salida: str | Path, columnas: 
         hoja.paste(im.resize((ancho, alto), Image.LANCZOS), ((k % columnas) * ancho, (k // columnas) * alto))
     hoja.save(salida, quality=90)
     return Path(salida)
+
+
+# ───────────────────────── Video rápido (3 pasos) ─────────────────────────
+# FastWan 2.2 (FastVideo, Apache 2.0) es Wan 2.2 5B destilado para generar en 3 pasos y sin «guía doble» (CFG):
+# unas 20 veces menos trabajo que 30 pasos con CFG. Usa estos tiempos fijos del ruido.
+PASOS_DMD = (1000, 757, 522)
+
+
+def programador_dmd(pasos: tuple[int, ...] = PASOS_DMD):
+    """Programador de ruido para FastWan: en cada paso predice la imagen limpia y la vuelve a ensuciar al nivel siguiente."""
+    import torch
+    from diffusers import FlowMatchEulerDiscreteScheduler
+
+    class ProgramadorDMD(FlowMatchEulerDiscreteScheduler):
+        def set_timesteps(self, num_inference_steps=None, device=None, **_):
+            t = torch.tensor(pasos, dtype=torch.float32)
+            self.timesteps = t.to(device)
+            self.sigmas = torch.cat([t / 1000.0, torch.zeros(1)]).to(device)
+            self.num_inference_steps = len(pasos)
+            self._step_index = None
+            self._begin_index = None
+
+    return ProgramadorDMD(num_train_timesteps=1000, shift=1.0, stochastic_sampling=True)
+
+
+# ───────────────────────── Fotos de entrenamiento ─────────────────────────
+# Lugares, luces y encuadres para crear fotos variadas del personaje (cuaderno 6).
+# La cara se conserva del recorte; cambia todo lo demás, así la IA aprende la cara y no el fondo de estudio.
+LUGARES_ENTRENAMIENTO = [
+    "in the driver seat of a {auto} with the top down, desert highway behind",
+    "leaning on the door of a parked {auto} on a gravel roadside",
+    "on an empty desert highway with mountains in the distance",
+    "in a field of tall dry grass",
+    "on a city street at night with neon signs and wet asphalt",
+    "inside a dim recording studio with warm lamps",
+    "on a rooftop at dusk with the city skyline behind",
+    "in the passenger seat of a {auto}, wind in the hair",
+    "at a roadside gas station at night under fluorescent lights",
+    "on a beach boardwalk with the ocean behind",
+]
+LUCES_ENTRENAMIENTO = [
+    "warm golden hour sunlight", "soft overcast daylight", "orange sunset backlight", "blue hour twilight",
+    "night, warm dashboard glow", "harsh midday sun", "neon pink and blue light", "soft window light",
+]
+ENCUADRES_ENTRENAMIENTO = ["primer_plano", "medio_izquierda", "medio_derecha", "cuerpo_izquierda", "cuerpo_derecha"]
+
+
+def variaciones_entrenamiento(cantidad: int, semilla: int = 3) -> list[dict]:
+    """Combinaciones repetibles de lugar, luz y encuadre (sin azar del sistema)."""
+    salida = []
+    for k in range(cantidad):
+        a = (k * 7 + semilla) % len(LUGARES_ENTRENAMIENTO)
+        b = (k * 5 + semilla * 3) % len(LUCES_ENTRENAMIENTO)
+        c = (k * 3 + semilla) % len(ENCUADRES_ENTRENAMIENTO)
+        salida.append({"lugar": LUGARES_ENTRENAMIENTO[a].format(auto=AUTO), "luz": LUCES_ENTRENAMIENTO[b],
+                       "encuadre": ENCUADRES_ENTRENAMIENTO[c], "semilla": semilla * 1000 + k})
+    return salida
