@@ -251,14 +251,56 @@ def tonalidad_en_ingles(p: dict) -> str | None:
 
 
 def letra_con_secciones(p: dict, por_bloque: int = 4) -> str:
-    """Letra del proyecto con etiquetas [verse]/[chorus] alternadas cada `por_bloque` líneas."""
-    lineas = [l["texto"] for l in p.get("letra", []) if l.get("texto", "").strip()]
-    out = []
-    for i in range(0, len(lineas), por_bloque):
+    """Letra del proyecto con etiquetas [verse]/[chorus]/… para el modelo de canción.
+
+    Usa la sección de cada línea (`seccion`) si la tiene; si no, alterna verso y coro cada `por_bloque` líneas."""
+    lineas = [l for l in p.get("letra", []) if l.get("texto", "").strip()]
+    out, actual = [], None
+    if any(l.get("seccion") for l in lineas):
+        for l in lineas:
+            sec = l.get("seccion") or actual or "verse"
+            if sec != actual:
+                if out:
+                    out.append("")
+                out.append(f"[{sec}]")
+                actual = sec
+            out.append(l["texto"])
+        return "\n".join(out).strip()
+    textos = [l["texto"] for l in lineas]
+    for i in range(0, len(textos), por_bloque):
         out.append("[verse]" if (i // por_bloque) % 2 == 0 else "[chorus]")
-        out.extend(lineas[i : i + por_bloque])
+        out.extend(textos[i : i + por_bloque])
         out.append("")
     return "\n".join(out).strip()
+
+
+def lineas_etiquetadas(letra: str) -> list[tuple[str, str]]:
+    """De una letra con etiquetas ([verse], [chorus]…) saca (sección, línea) en orden."""
+    out, sec = [], "verse"
+    for l in letra.splitlines():
+        l = l.strip()
+        if not l:
+            continue
+        if l.startswith("[") and l.endswith("]"):
+            sec = l[1:-1].strip().lower()
+            continue
+        out.append((sec, l))
+    return out
+
+
+def tiempos_estimados(letra: str, bpm: float = 95) -> tuple[list[dict], float]:
+    """Reparte la letra sobre los compases como la cantaría una canción: 2 compases por línea, un compás entre
+    secciones, entrada y final instrumentales. Devuelve (líneas con tiempos, duración sugerida en segundos)."""
+    compas = 4 * 60.0 / (bpm or 95)
+    t, anterior, lineas = 2 * compas, None, []
+    for sec, texto in lineas_etiquetadas(letra):
+        if anterior is not None and sec != anterior:
+            t += compas
+        lineas.append({"texto": texto, "inicio": round(t, 2), "fin": round(t + 2 * compas - 0.3, 2), "seccion": sec})
+        t += 2 * compas
+        anterior = sec
+    duracion = t + 4 * compas
+    return lineas, float(min(300.0, max(60.0, round(duracion / 5) * 5)))
 
 
 # ───────────────────────── Audio ─────────────────────────

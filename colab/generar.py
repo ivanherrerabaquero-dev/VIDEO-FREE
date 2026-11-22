@@ -81,7 +81,10 @@ class Director:
         self.p = comun.proyecto(cfg.proyecto)
         self.duracion = self.p.get("duracion") or comun.duracion(comun.bajar(self.p["audio"]))
         self.nombre = comun.slug(self.p.get("titulo", "video"))
-        self.carpeta = f"{self.nombre}_{cfg.formato}{'_borrador' if cfg.borrador else ''}"
+        # la carpeta lleva una huella de la canción: si cambias la canción, no se mezclan tomas viejas con las nuevas
+        import hashlib
+        huella = hashlib.sha1(f"{self.p.get('audio')}|{round(self.duracion, 1)}".encode()).hexdigest()[:6]
+        self.carpeta = f"{self.nombre}_{cfg.formato}{'_borrador' if cfg.borrador else ''}_{huella}"
         self.base = f"medios/director/{self.carpeta}"   # lo compartido entre GPU, en tu repo
         self.local = comun.TRABAJO / self.carpeta
         self.local.mkdir(parents=True, exist_ok=True)
@@ -97,11 +100,14 @@ class Director:
             print("Uso el plano compartido de", self.base)
             return json.loads(datos)
         guardado = (self.p.get("director") or {})
-        if guardado.get("plano") and guardado.get("formato") == self.cfg.formato:
-            plano = guardado["plano"]
+        plano_guardado = guardado.get("plano") or []
+        # el plano guardado solo sirve si es de esta misma canción (misma duración) y formato
+        if (plano_guardado and guardado.get("formato") == self.cfg.formato and guardado.get("carpeta") == self.base
+                and abs(plano_guardado[-1]["hasta"] - self.duracion) < 0.5):
+            plano = plano_guardado
         else:
-            plano = director.planear(self.duracion, self.p.get("bpm") or 95, self.p.get("letra"),
-                                     semilla=self.cfg.semilla, ritmo=self.cfg.ritmo)
+            plano = director.planear_auto(self.duracion, self.p.get("bpm") or 95, self.p.get("letra"),
+                                          semilla=self.cfg.semilla, ritmo=self.cfg.ritmo)
         if self.cfg.trabajadores > 1 or comun._token:
             try:
                 comun.guardar(f"{self.base}/plano.json", json.dumps(plano, ensure_ascii=False, indent=1), f"Director: plano de {self.carpeta}")
@@ -289,6 +295,8 @@ class Director:
         if cfg.formato == "vertical":
             aw, ah = ah, aw
         pasos = 3 if rapido else (cfg.pasos_video or (30 if grande else 20))
+        # en la T4 caben ~3,4 s (81 cuadros) a la vez; el montaje estira las tomas más largas en cámara lenta (hasta 1,6x)
+        maximo = 121 if grande else 81
         guia = 1.0 if rapido else 5.0
 
         en_repo = self._en_repo()
@@ -335,7 +343,8 @@ class Director:
                 try:
                     with torch.no_grad():
                         cuadros = pipe(image=ajustar(Image.open(self.claves[n]).convert("RGB")), prompt_embeds=pe, negative_prompt_embeds=ne,
-                                       height=ah, width=aw, num_frames=director.cuadros_para(duracion_gen, 24), num_inference_steps=pasos,
+                                       height=ah, width=aw, num_frames=director.cuadros_para(duracion_gen, 24, maximo=maximo),
+                                       num_inference_steps=pasos,
                                        guidance_scale=guia, generator=torch.Generator("cuda").manual_seed(t["semilla"])).frames[0]
                     break
                 except torch.cuda.OutOfMemoryError:
