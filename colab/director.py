@@ -277,11 +277,12 @@ def duracion_de(archivo: str | Path) -> float:
 
 def montar(plano: list[dict], clips: dict[int, str | Path], audio: str | Path, salida: str | Path,
            formato: str = "horizontal", fps: int = 24, franjas: bool = True, grano: int = 7,
-           carpeta: str | Path | None = None, crf: int = 20) -> Path:
+           carpeta: str | Path | None = None, crf: int = 20, resolucion: int = 1080) -> Path:
     """Une las tomas en un video con la canción.
 
     clips: número de toma → archivo de video. Una toma sin clip queda en negro (para ver el ritmo igual)."""
-    W, H = (1920, 1080) if formato == "horizontal" else (1080, 1920)
+    corto, largo = resolucion, round(resolucion * 16 / 9 / 2) * 2  # 1080 → 1920x1080, 720 → 1280x720
+    W, H = (largo, corto) if formato == "horizontal" else (corto, largo)
     carpeta = Path(carpeta or Path(salida).parent / "montaje")
     carpeta.mkdir(parents=True, exist_ok=True)
     partes = []
