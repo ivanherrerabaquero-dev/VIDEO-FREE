@@ -59,7 +59,13 @@ def preparar(repo: str = REPO, rama: str = RAMA, usar_drive: bool = True, exigir
             try:  # Kaggle: Add-ons → Secrets
                 from kaggle_secrets import UserSecretsClient  # type: ignore
 
-                _token = UserSecretsClient().get_secret("GITHUB_TOKEN")
+                for nombre_secreto in ("GITHUB_TOKEN", "TOKEN"):  # se acepta también «TOKEN»
+                    try:
+                        _token = UserSecretsClient().get_secret(nombre_secreto)
+                        if _token:
+                            break
+                    except Exception:
+                        _token = None
             except Exception:
                 _token = None
     print("GitHub:", f"conectado a {REPO} ({RAMA})" if _token else "sin token (solo lectura). Agrega el secreto GITHUB_TOKEN para guardar.")
