@@ -48,7 +48,12 @@ export async function probar() {
 export async function leer(camino) {
   const d = await pedir("GET", `contents/${ruta(camino)}?ref=${encodeURIComponent(config().rama)}&t=${Date.now()}`);
   if (!d || Array.isArray(d)) return null;
-  const bytes = deBase64(d.content || "");
+  let bytes = deBase64(d.content || "");
+  if (d.encoding === "none" || (!bytes.length && d.size > 0)) { // archivos de más de 1 MB: la API no los manda en base64
+    const c = config(), r = await fetch(`${API}/repos/${c.dueno}/${c.repo}/contents/${ruta(camino)}?ref=${encodeURIComponent(c.rama)}&t=${Date.now()}`, { headers: { Accept: "application/vnd.github.raw+json", "X-GitHub-Api-Version": "2022-11-28", ...(c.token ? { Authorization: `Bearer ${c.token}` } : {}) } });
+    if (!r.ok) throw new Error(`GitHub respondió ${r.status} al leer ${camino}.`);
+    bytes = new Uint8Array(await r.arrayBuffer());
+  }
   return { texto: new TextDecoder().decode(bytes), bytes, sha: d.sha };
 }
 

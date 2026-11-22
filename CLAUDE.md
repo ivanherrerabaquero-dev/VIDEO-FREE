@@ -11,19 +11,23 @@ Estudio web de videos musicales con **código propio**. El dueño no quiere depe
 5. Nombres, comentarios y textos de la interfaz en español.
 6. Las escenas deben verse bien en horizontal y en vertical (`H > W`).
 7. Licencia propietaria (`LICENSE`): no agregar código con otra licencia.
+8. **Excepción: `colab/`.** Los cuadernos de Google Colab pueden instalar y ejecutar modelos de IA abiertos de terceros (solo con licencias MIT, Apache 2.0 u OpenRAIL++, listadas en `colab/LICENCIAS-TERCEROS.md`). Nada de eso se copia al repo ni entra al portal web; se descarga en Colab al usarlo. No usar modelos con licencias no comerciales (por ejemplo Wav2Lip, MusicGen, HunyuanVideo).
 
 ## Mapa
 
 - `index.html`, `css/estilo.css` — el portal.
 - `js/motor.js` — motor de dibujo: utilidades, piezas (cielo, paisaje, auto, personaje), escenas (`ESCENAS`), letra karaoke, línea melódica, acabado y `dibujar()`.
-- `js/sonido.js` — carga de audio, pista de prueba sintetizada, medición LUFS.
+- `js/sonido.js` — carga de audio y medición LUFS.
+- `js/dsp.js` — núcleo de audio propio: biquads, resonadores de formante, reverb, compresor, limitador.
+- `js/instrumentos.js` — instrumentos sintetizados (batería, bajo 808, guitarra Karplus-Strong, piano, cuerdas, percusión) y arreglista por secciones.
 - `js/voz.js` — análisis de la voz: tono (YIN), energía, rango, tonalidad, frases.
-- `js/canto.js` — cantante sintético por formantes: texto en español → fonemas → partitura → audio; mezcla con la canción y exporta WAV.
+- `js/canto.js` — cantante: texto en español → fonemas → partitura → audio. Motor «sintetica» (formantes tipo Klatt con jitter, shimmer, aire, vibrato, coarticulación, doblaje) y motor «mivoz» (PSOLA con las vocales grabadas por el dueño en `medios/voz/`). Mezcla final con la pista.
 - `js/exportar.js` — grabación con MediaRecorder y portada PNG.
 - `js/github.js` — leer y guardar en el repo con la API de GitHub.
 - `js/app.js` — la interfaz.
 - `proyectos/*.json` — cada video: datos, escenas, letra y análisis de voz. `proyectos/indice.json` lista los proyectos.
 - `medios/` — personajes, audio y clips. `ideas/ideas.md` — libreta del dueño.
+- `colab/` — cuadernos de IA (canción con voz, mi voz con RVC, video con Wan, labios con LatentSync) y `comun.py` (GitHub, Drive, audio, alineación de letra). Los cuadernos se generan con celdas JSON; valida su sintaxis antes de subirlos.
 
 ## Cómo agregar una escena nueva
 

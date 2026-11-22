@@ -1,13 +1,15 @@
 // VIDEO-FREE · El portal: une el motor, el sonido, la voz, la exportación y GitHub.
 import { dibujar, FORMATOS, TIPOS_ESCENA, mediosDe, limitar } from "./motor.js";
-import { contexto, decodificar, cargarAudio, pistaDemo, medirVolumen } from "./sonido.js";
+import { contexto, decodificar, medirVolumen } from "./sonido.js";
 import { analizarVoz, letraSegunVoz } from "./voz.js";
 import { grabarVideo, exportarImagen, descargar, tipoDisponible } from "./exportar.js";
-import { cantar, mezclar, aWav } from "./canto.js";
+import { cantar, mezclar, aWav, prepararVocal } from "./canto.js";
+import { generarArreglo, armonia, ESTILOS, INSTRUMENTOS } from "./instrumentos.js";
+import { aBuffer } from "./dsp.js";
 import * as gh from "./github.js";
 
 const $ = (id) => document.getElementById(id);
-const E = { proyecto: null, archivo: "carretera-sin-ti.json", R: { img: {}, video: {}, reproduciendo: false }, buffer: null, canto: null, mezcla: null, bufferVoz: null, t: 0, sonando: false, fuente: null, t0: 0, audioLocal: "" };
+const E = { proyecto: null, archivo: "carretera-sin-ti.json", R: { img: {}, video: {}, reproduciendo: false }, buffer: null, canto: null, mezcla: null, banco: {}, crudo: {}, bufferVoz: null, t: 0, sonando: false, fuente: null, t0: 0, audioLocal: "" };
 window.estudio = E; // para depurar desde la consola
 
 const estado = (txt, clase = "") => { $("estado").textContent = txt; $("estado").className = "estado " + clase; };
@@ -37,19 +39,22 @@ async function cargarMedios() {
   const m = mediosDe(E.proyecto), faltan = [];
   await Promise.all(m.img.filter((c) => !E.R.img[c]).map(async (c) => { const im = await cargarImagen(c); im ? (E.R.img[c] = im) : faltan.push(c); }));
   for (const c of m.video) if (!E.R.video[c]) {
-    const v = document.createElement("video"); v.muted = true; v.playsInline = true; v.preload = "auto"; v.src = c;
-    await new Promise((ok) => { v.onloadeddata = ok; v.onerror = () => { faltan.push(c); ok(); }; });
+    const v = document.createElement("video"); v.muted = true; v.playsInline = true; v.loop = true; v.preload = "auto";
+    const cargar = (src) => new Promise((ok) => { v.onloadeddata = () => ok(true); v.onerror = () => ok(false); v.src = src; });
+    // primero desde el sitio; si aún no está publicado, directo desde GitHub
+    if (!(await cargar(c)) && !(gh.conectado() && (await cargar(await urlDe(c).catch(() => ""))))) faltan.push(c);
     E.R.video[c] = v;
   }
   if (faltan.length) estado(`No encontré: ${faltan.join(", ")}`, "mal");
 }
 
-function remezclar() { E.mezcla = E.canto ? mezclar(contexto(), E.buffer, E.canto, (E.proyecto.canto && E.proyecto.canto.volumen) ?? 0.8, E.proyecto.duracion) : null; }
+function remezclar() { E.mezcla = E.canto ? mezclar(contexto(), E.buffer, E.canto, (E.proyecto.canto && E.proyecto.canto.volumen) ?? 0.85, E.proyecto.duracion) : null; }
+const pistaGenerada = () => !E.audioLocal && (!E.proyecto.audio || E.proyecto.audio === "demo");
 async function cargarCancion() { try { await cargarCancionBase(); } finally { remezclar(); } }
 async function cargarCancionBase() {
   const p = E.proyecto;
   if (E.audioLocal) { $("infoAudio").textContent = `Sonando: ${E.audioLocal} (archivo de este equipo; súbelo en Medios para que quede en el repo).`; return; }
-  if (!p.audio || p.audio === "demo") { E.buffer = pistaDemo(p.duracion, p.bpm); $("infoAudio").textContent = "Sonando: pista de prueba generada por el estudio. Carga tu canción para reemplazarla."; return; }
+  if (!p.audio || p.audio === "demo") { await generarPista(true); $("infoAudio").textContent = "Sonando: pista generada por el estudio (pestaña Música). Carga tu canción para reemplazarla."; return; }
   try {
     E.buffer = await decodificar((await bytesDe(p.audio)).buffer);
     $("infoAudio").textContent = `Sonando: ${p.audio} (${mmss(E.buffer.duration)}).`;
@@ -105,7 +110,10 @@ function llenarFormulario() {
   $("fTitulo").value = p.titulo || ""; $("fArtista").value = p.artista || ""; $("fBpm").value = p.bpm; $("fDur").value = p.duracion;
   $("fAcento").value = p.colores.acento; $("fNoche").value = p.colores.acentoNoche; $("fTexto").value = p.colores.texto;
   $("fAudioRuta").value = p.audio && p.audio !== "demo" ? p.audio : "";
-  const ct = p.canto || {}; $("selMelodia").value = ct.melodia || "voz"; $("selOctava").value = ct.octava || 0; $("rCanto").value = ct.volumen ?? 0.8;
+  const ct = p.canto || {}; $("selMelodia").value = ct.melodia || "voz"; $("selOctava").value = ct.octava || 0; $("rCanto").value = ct.volumen ?? 0.85;
+  $("selMotor").value = ct.motor || "sintetica"; $("selTimbre").value = ct.timbre || "masculina"; $("rAire").value = ct.aire ?? 0.08; $("chkAfinar").checked = ct.afinar !== false;
+  const ar = p.arreglo || {}; $("selEstilo").value = ar.estilo || "reggaeton"; $("selTonalidad").value = ar.tonalidad || "auto"; $("selProgresion").value = ar.progresion || 0; $("rIntensidad").value = ar.intensidad ?? 0.8;
+  for (const k in INSTRUMENTOS) $("ins_" + k).checked = !ar.instrumentos || ar.instrumentos[k] !== false;
   $("cursor").max = p.duracion; $("chkLetra").checked = p.mostrarLetra !== false; $("chkReactiva").checked = p.vozReactiva !== false;
   $("tLetra").value = (p.letra || []).map((l) => l.texto).join("\n");
   pintarEscenas(); pintarVoz();
@@ -137,7 +145,7 @@ async function abrirProyecto(datos, archivo) {
   E.proyecto.colores ||= { acento: "#ff8a3d", acentoNoche: "#3fd6ff", texto: "#fff6ea" }; E.proyecto.escenas ||= []; E.proyecto.letra ||= [];
   llenarFormulario(); pintarPista(); ajustarLienzo();
   await Promise.all([cargarMedios(), cargarCancion().catch(fallo)]);
-  if (E.proyecto.canto && E.proyecto.canto.activo) await generarCanto(true).catch(fallo);
+  if (E.proyecto.canto && E.proyecto.canto.activo && E.proyecto.canto.motor !== "mivoz") await generarCanto(true).catch(fallo);
   pintar();
 }
 async function listarProyectos() {
@@ -264,16 +272,43 @@ $("fVoz").onchange = seguro(async (e) => { const f = e.target.files[0]; if (f) {
 $("btnAnalizar").onclick = seguro(() => analizar(E.bufferVoz, "voz sola"));
 $("btnAnalizarCancion").onclick = seguro(() => analizar(E.buffer, "canción completa"));
 
-// ───────────── Voz cantada sintética ─────────────
+// ───────────── Música: pista generada ─────────────
+const NOTAS_T = ["Do", "Do#", "Re", "Re#", "Mi", "Fa", "Fa#", "Sol", "Sol#", "La", "La#", "Si"];
+$("selTonalidad").innerHTML = '<option value="auto">Automática (la de mi voz)</option>' + ["menor", "mayor"].flatMap((m) => NOTAS_T.map((n) => `<option>${n} ${m}</option>`)).join("");
+$("cajaInstrumentos").innerHTML = Object.entries(INSTRUMENTOS).map(([k, n]) => `<label class="check"><input type="checkbox" id="ins_${k}" checked> ${n}</label>`).join("");
+function leerArreglo() {
+  return { estilo: $("selEstilo").value, tonalidad: $("selTonalidad").value, progresion: +$("selProgresion").value, intensidad: +$("rIntensidad").value,
+    instrumentos: Object.fromEntries(Object.keys(INSTRUMENTOS).map((k) => [k, $("ins_" + k).checked])) };
+}
+async function generarPista(silencioso = false) {
+  const p = E.proyecto; if (!silencioso) { parar(); p.arreglo = leerArreglo(); }
+  $("progPista").hidden = false; if (!silencioso) estado("Componiendo y tocando la pista…");
+  const r = await generarArreglo(p, p.arreglo || {}, (k) => ($("progPista").value = k));
+  $("progPista").hidden = true; E.buffer = aBuffer(contexto(), r.L, r.R); E.infoPista = r.info;
+  const sec = r.info.secciones.reduce((a, x) => (a.at(-1) && a.at(-1)[0] === x ? a.at(-1)[1]++ : a.push([x, 1]), a), []).map(([x, n]) => `${x} ${n}`).join(" · ");
+  $("infoPista").textContent = `${ESTILOS[r.info.estilo].nombre} en ${r.info.tonalidad}, ${p.bpm} BPM. Acordes: ${r.info.acordes.join(" – ")}. Compases: ${sec}.`;
+  if (!silencioso) { if (E.canto && p.canto && p.canto.melodia === "compuesta") await generarCanto(true); remezclar(); pintar(); estado("Pista lista. Pulsa Reproducir para oírla.", "bien"); }
+}
+$("btnPista").onclick = seguro(async () => { if (!pistaGenerada()) { E.audioLocal = ""; E.proyecto.audio = "demo"; $("fAudioRuta").value = ""; } await generarPista(); });
+$("btnBpmEstilo").onclick = () => { E.proyecto.bpm = ESTILOS[$("selEstilo").value].bpm; $("fBpm").value = E.proyecto.bpm; estado(`BPM en ${E.proyecto.bpm}. Pulsa «Generar pista» para oírlo.`, "bien"); };
+$("btnBajarPista").onclick = seguro(() => { if (!E.buffer) throw new Error("No hay pista."); descargar(aWav(E.buffer), `${slug(E.proyecto.titulo)}_pista.wav`); });
+
+// ───────────── Voz que canta la letra ─────────────
+const comoBuffer = (x) => ({ sampleRate: 44100, length: x.L.length, numberOfChannels: 2, getChannelData: (c) => (c ? x.R : x.L) });
 async function generarCanto(silencioso = false) {
   const p = E.proyecto; parar(); leerLetraSiHaceFalta();
-  if (p.voz && p.voz.deCanto) p.voz = null; // el análisis anterior venía del propio cantante sintético
-  p.canto = { activo: true, melodia: $("selMelodia").value, octava: +$("selOctava").value, volumen: +$("rCanto").value };
-  if (!silencioso) estado("Generando la voz cantada…");
-  E.canto = await cantar(p, p.canto); remezclar();
+  if (p.voz && p.voz.deCanto) p.voz = null; // el análisis anterior venía de la propia voz generada
+  p.canto = { activo: true, motor: $("selMotor").value, timbre: $("selTimbre").value, melodia: $("selMelodia").value, octava: +$("selOctava").value, volumen: +$("rCanto").value, aire: +$("rAire").value, afinar: $("chkAfinar").checked };
+  if (!silencioso) estado(p.canto.motor === "mivoz" ? "Cantando con tus vocales…" : "Generando la voz cantada…");
+  $("progCanto").hidden = false;
+  try {
+    const ar = pistaGenerada() ? armonia(p, p.arreglo || {}) : null;
+    E.canto = await cantar(p, { ...p.canto, armonia: ar, tonalidad: ar ? `${NOTAS_T[ar.tonalidad.raiz]} ${ar.tonalidad.modo}` : "auto" }, E.banco);
+  } finally { $("progCanto").hidden = true; }
+  remezclar();
   const conMelodiaPropia = p.canto.melodia === "voz" && p.voz && p.voz.resumen;
-  if (!p.voz) { p.voz = await analizarVoz(E.canto); p.voz.deCanto = true; pintarVoz(); } // así el video también reacciona a esta voz
-  $("infoCanto").textContent = `Voz cantada lista: ${p.letra.length} líneas, ${conMelodiaPropia ? "con la melodía de tu pista de voz" : "con melodía compuesta por el estudio"}. Si cambias la letra o los tiempos, vuelve a generarla.`;
+  if (!p.voz) { p.voz = await analizarVoz(comoBuffer(E.canto)); p.voz.deCanto = true; pintarVoz(); } // así el video también reacciona a esta voz
+  $("infoCanto").textContent = `Voz lista (${p.canto.motor === "mivoz" ? "con tus vocales" : "sintética"}): ${p.letra.length} líneas, ${conMelodiaPropia ? "con la melodía de tu pista de voz" : "con melodía compuesta sobre los acordes"}. Si cambias la letra o los tiempos, vuelve a generarla.`;
   pintar(); if (!silencioso) estado("Voz cantada generada. Pulsa Reproducir para oírla.", "bien");
 }
 const leerLetraSiHaceFalta = () => { if (!(E.proyecto.letra || []).length) leerLetra(); };
@@ -281,6 +316,40 @@ $("btnCantar").onclick = seguro(() => generarCanto());
 $("btnQuitarCanto").onclick = () => { parar(); E.canto = null; E.mezcla = null; if (E.proyecto.canto) E.proyecto.canto.activo = false; if (E.proyecto.voz && E.proyecto.voz.deCanto) { E.proyecto.voz = null; pintarVoz(); } $("infoCanto").textContent = "Voz cantada quitada."; pintar(); };
 $("btnBajarCanto").onclick = seguro(() => { if (!E.canto) throw new Error("Primero genera la voz cantada."); descargar(aWav(E.canto), `${slug(E.proyecto.titulo)}_voz_cantada.wav`); });
 $("rCanto").onchange = () => { if (E.proyecto.canto) E.proyecto.canto.volumen = +$("rCanto").value; const s = E.sonando; if (s) parar(); remezclar(); if (s) reproducir(); };
+
+// ───────────── Banco de vocales del usuario ─────────────
+const VOCALES_B = ["a", "e", "i", "o", "u"], EJEMPLO = { a: "c-a-sa", e: "m-e-sa", i: "s-i", o: "s-o-l", u: "l-u-na" };
+$("filasVocales").innerHTML = VOCALES_B.map((v) => `<div class="vocal"><b>${v.toUpperCase()}</b><span id="estVoc_${v}">Sin grabar (como en «${EJEMPLO[v]}»)</span><button id="grab_${v}">● Grabar</button><label class="boton">Archivo<input type="file" id="arch_${v}" accept="audio/*" hidden></label><button id="oir_${v}" disabled>▶</button></div>`).join("");
+async function ponerVocal(v, buffer) {
+  const b = prepararVocal(buffer); E.banco[v] = b; E.crudo[v] = b.datos;
+  const nota = NOTAS_T[((Math.round(69 + 12 * Math.log2(b.hz / 440)) % 12) + 12) % 12];
+  $("estVoc_" + v).textContent = `Lista: ${b.segundos.toFixed(1)} s, nota ${nota} (${b.hz.toFixed(0)} Hz)`; $("oir_" + v).disabled = false;
+}
+async function grabar(segundos = 2.6) {
+  const flujo = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+  const rec = new MediaRecorder(flujo), trozos = []; rec.ondataavailable = (e) => trozos.push(e.data);
+  const fin = new Promise((ok) => (rec.onstop = ok)); rec.start(); await new Promise((ok) => setTimeout(ok, segundos * 1000)); rec.stop(); await fin;
+  flujo.getTracks().forEach((t) => t.stop());
+  return decodificar(await new Blob(trozos).arrayBuffer());
+}
+for (const v of VOCALES_B) {
+  $("grab_" + v).onclick = seguro(async () => { estado(`Grabando la «${v}»: sostenla 2 segundos…`); $("grab_" + v).disabled = true; try { await ponerVocal(v, await grabar()); estado(`Vocal «${v}» lista.`, "bien"); } finally { $("grab_" + v).disabled = false; } });
+  $("arch_" + v).onchange = seguro(async (e) => { const f = e.target.files[0]; if (f) { await ponerVocal(v, await decodificar(await f.arrayBuffer())); estado(`Vocal «${v}» cargada.`, "bien"); } });
+  $("oir_" + v).onclick = seguro(async () => { const d = E.crudo[v]; if (!d) return; const ac = contexto(); await ac.resume(); const s = ac.createBufferSource(); s.buffer = aBuffer(ac, d, d); s.connect(ac.destination); s.start(); });
+}
+$("btnGuardarBanco").onclick = seguro(async () => {
+  if (!gh.conectado()) throw new Error("Primero conecta GitHub en la pestaña GitHub.");
+  const listas = VOCALES_B.filter((v) => E.crudo[v]); if (!listas.length) throw new Error("Graba al menos una vocal.");
+  for (const v of listas) { estado(`Guardando vocal «${v}»…`); await gh.guardar(`medios/voz/${v}.wav`, new Uint8Array(await aWav({ L: E.crudo[v], R: E.crudo[v] }).arrayBuffer()), `Banco de vocales: ${v}`); }
+  await gh.guardar("medios/voz/indice.json", JSON.stringify(VOCALES_B.filter((v) => E.crudo[v])) + "\n", "Banco de vocales: índice");
+  $("infoBanco").textContent = `Guardadas en medios/voz/: ${listas.join(", ")}.`; estado("Banco de vocales guardado en GitHub.", "bien");
+});
+async function cargarBanco() {
+  let n = 0;
+  let lista = []; try { lista = JSON.parse(new TextDecoder().decode(await bytesDe("medios/voz/indice.json"))); } catch {}
+  for (const v of lista.filter((x) => VOCALES_B.includes(x))) { try { await ponerVocal(v, await decodificar((await bytesDe(`medios/voz/${v}.wav`)).buffer)); n++; } catch {} }
+  if (n) $("infoBanco").textContent = `Banco cargado desde el repo: ${n} de 5 vocales.`;
+}
 
 // ───────────── Medios: quitar fondo y subir ─────────────
 let imagenOriginal = null;
@@ -360,11 +429,32 @@ $("btnConectar").onclick = seguro(async () => {
 });
 $("btnOlvidar").onclick = () => { const c = gh.config(); gh.guardarConfig({ ...c, token: "" }); llenarGithub(); $("infoGithub").textContent = "Token borrado de este navegador."; };
 
+// ───────────── IA en Colab ─────────────
+const CUADERNOS = [
+  ["1_cancion_ia.ipynb", "1 · Canción completa con voz", "Genera la canción con voz cantando tu letra en español e instrumentos (ACE-Step 1.5), separa la voz y sincroniza la letra palabra por palabra.", "T4 gratis sirve"],
+  ["2_mi_voz_rvc.ipynb", "2 · Que cante tu voz", "Entrena un modelo con 10 minutos o más de tu voz y convierte la voz de la canción a tu timbre (RVC).", "T4 gratis sirve"],
+  ["3_video_ia.ipynb", "3 · Tomas de video con IA", "Crea tomas realistas desde texto o desde una imagen (Wan 2.2 / 2.1) y las pone en las escenas.", "L4 o A100 para 720p e imagen → video; T4 para 480p"],
+  ["4_labios_ia.ipynb", "4 · Labios sincronizados", "Mueve la boca del cantante en una toma para que cante la parte de la canción de esa escena (LatentSync).", "L4 o A100 (T4 con menos resolución)"],
+];
+function pintarCuadernos() {
+  const c = gh.config(), dueno = c.dueno || "ivanherrerabaquero-dev", repo = c.repo || "VIDEO-FREE", rama = c.rama || "main";
+  $("listaCuadernos").innerHTML = CUADERNOS.map(([f, t, d, g]) => `<div class="cuaderno"><div><b>${t}</b><p class="nota">${d}</p><span>GPU: ${g}</span></div>
+    <a class="boton primario" target="_blank" rel="noopener" href="https://colab.research.google.com/github/${dueno}/${repo}/blob/${rama}/colab/${f}">Abrir en Colab</a></div>`).join("");
+}
+$("btnRecargar").onclick = seguro(async () => {
+  if (!E.archivo) throw new Error("Este proyecto aún no está guardado en el repo.");
+  estado("Recargando el proyecto…");
+  const datos = JSON.parse(new TextDecoder().decode(await bytesDe(`proyectos/${E.archivo}`)));
+  E.R.video = {}; await abrirProyecto(datos, E.archivo);
+  estado(`Proyecto recargado: ${datos.titulo}. ${datos.audio && datos.audio !== "demo" ? "Suena " + datos.audio + "." : ""}`, "bien");
+});
+
 // ───────────── Arranque ─────────────
 seguro(async () => {
-  llenarGithub();
+  llenarGithub(); pintarCuadernos();
   const datos = JSON.parse(new TextDecoder().decode(await bytesDe(`proyectos/${E.archivo}`)));
   await abrirProyecto(datos, E.archivo); await listarProyectos();
   $("tIdeas").value = new TextDecoder().decode(await bytesDe("ideas/ideas.md").catch(() => new Uint8Array()));
+  cargarBanco().catch(() => {});
   estado(gh.conectado() ? "Listo. GitHub conectado." : "Listo. Conecta GitHub para guardar desde aquí.", "bien");
 })();
