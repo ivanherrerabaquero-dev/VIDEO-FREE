@@ -157,7 +157,7 @@
     "aire": 0.08,
     "afinar": true
   },
-  "audio_anterior": "demo",
+  "audio_anterior": "medios/audio/carretera-sin-ti_ia.mp3",
   "ia": {
     "cancion": {
       "modelo": "ACE-Step 1.5 XL Turbo",
