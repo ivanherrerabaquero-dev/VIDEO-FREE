@@ -346,7 +346,8 @@ const ESCENAS = {
   /** Un clip de video (por ejemplo una toma generada con IA) a pantalla completa. */
   video(c, W, H, e, tl, dur, p, R) {
     const vid = R.video[e.archivo]; if (!vid) return;
-    const objetivo = (e.inicioClip || 0) + tl;
+    let objetivo = (e.inicioClip || 0) + tl;
+    if (vid.duration > 0.1) objetivo %= vid.duration; // si la escena dura más que la toma, la toma se repite
     if (Math.abs(vid.currentTime - objetivo) > (R.reproduciendo ? 0.35 : 0.04)) vid.currentTime = objetivo;
     if (R.reproduciendo && vid.paused) vid.play().catch(() => {}); else if (!R.reproduciendo && !vid.paused) vid.pause();
     cubrir(c, vid, W, H, 1, vid.videoWidth, vid.videoHeight);

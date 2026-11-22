@@ -39,8 +39,10 @@ async function cargarMedios() {
   const m = mediosDe(E.proyecto), faltan = [];
   await Promise.all(m.img.filter((c) => !E.R.img[c]).map(async (c) => { const im = await cargarImagen(c); im ? (E.R.img[c] = im) : faltan.push(c); }));
   for (const c of m.video) if (!E.R.video[c]) {
-    const v = document.createElement("video"); v.muted = true; v.playsInline = true; v.preload = "auto"; v.src = c;
-    await new Promise((ok) => { v.onloadeddata = ok; v.onerror = () => { faltan.push(c); ok(); }; });
+    const v = document.createElement("video"); v.muted = true; v.playsInline = true; v.loop = true; v.preload = "auto";
+    const cargar = (src) => new Promise((ok) => { v.onloadeddata = () => ok(true); v.onerror = () => ok(false); v.src = src; });
+    // primero desde el sitio; si aún no está publicado, directo desde GitHub
+    if (!(await cargar(c)) && !(gh.conectado() && (await cargar(await urlDe(c).catch(() => ""))))) faltan.push(c);
     E.R.video[c] = v;
   }
   if (faltan.length) estado(`No encontré: ${faltan.join(", ")}`, "mal");
@@ -427,9 +429,29 @@ $("btnConectar").onclick = seguro(async () => {
 });
 $("btnOlvidar").onclick = () => { const c = gh.config(); gh.guardarConfig({ ...c, token: "" }); llenarGithub(); $("infoGithub").textContent = "Token borrado de este navegador."; };
 
+// ───────────── IA en Colab ─────────────
+const CUADERNOS = [
+  ["1_cancion_ia.ipynb", "1 · Canción completa con voz", "Genera la canción con voz cantando tu letra en español e instrumentos (ACE-Step 1.5), separa la voz y sincroniza la letra palabra por palabra.", "T4 gratis sirve"],
+  ["2_mi_voz_rvc.ipynb", "2 · Que cante tu voz", "Entrena un modelo con 10 minutos o más de tu voz y convierte la voz de la canción a tu timbre (RVC).", "T4 gratis sirve"],
+  ["3_video_ia.ipynb", "3 · Tomas de video con IA", "Crea tomas realistas desde texto o desde una imagen (Wan 2.2 / 2.1) y las pone en las escenas.", "L4 o A100 para 720p e imagen → video; T4 para 480p"],
+  ["4_labios_ia.ipynb", "4 · Labios sincronizados", "Mueve la boca del cantante en una toma para que cante la parte de la canción de esa escena (LatentSync).", "L4 o A100 (T4 con menos resolución)"],
+];
+function pintarCuadernos() {
+  const c = gh.config(), dueno = c.dueno || "ivanherrerabaquero-dev", repo = c.repo || "VIDEO-FREE", rama = c.rama || "main";
+  $("listaCuadernos").innerHTML = CUADERNOS.map(([f, t, d, g]) => `<div class="cuaderno"><div><b>${t}</b><p class="nota">${d}</p><span>GPU: ${g}</span></div>
+    <a class="boton primario" target="_blank" rel="noopener" href="https://colab.research.google.com/github/${dueno}/${repo}/blob/${rama}/colab/${f}">Abrir en Colab</a></div>`).join("");
+}
+$("btnRecargar").onclick = seguro(async () => {
+  if (!E.archivo) throw new Error("Este proyecto aún no está guardado en el repo.");
+  estado("Recargando el proyecto…");
+  const datos = JSON.parse(new TextDecoder().decode(await bytesDe(`proyectos/${E.archivo}`)));
+  E.R.video = {}; await abrirProyecto(datos, E.archivo);
+  estado(`Proyecto recargado: ${datos.titulo}. ${datos.audio && datos.audio !== "demo" ? "Suena " + datos.audio + "." : ""}`, "bien");
+});
+
 // ───────────── Arranque ─────────────
 seguro(async () => {
-  llenarGithub();
+  llenarGithub(); pintarCuadernos();
   const datos = JSON.parse(new TextDecoder().decode(await bytesDe(`proyectos/${E.archivo}`)));
   await abrirProyecto(datos, E.archivo); await listarProyectos();
   $("tIdeas").value = new TextDecoder().decode(await bytesDe("ideas/ideas.md").catch(() => new Uint8Array()));

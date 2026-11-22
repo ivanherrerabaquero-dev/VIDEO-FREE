@@ -29,7 +29,7 @@
 
   <section class="panel">
     <nav id="pestanas" role="tablist">
-      <button data-p="proyecto" class="activa">Proyecto</button><button data-p="escenas">Escenas</button><button data-p="letra">Letra</button><button data-p="musica">Música</button><button data-p="voz">Voz</button><button data-p="medios">Medios</button><button data-p="exportar">Exportar</button><button data-p="ideas">Ideas</button><button data-p="github">GitHub</button>
+      <button data-p="proyecto" class="activa">Proyecto</button><button data-p="escenas">Escenas</button><button data-p="letra">Letra</button><button data-p="musica">Música</button><button data-p="voz">Voz</button><button data-p="medios">Medios</button><button data-p="exportar">Exportar</button><button data-p="ideas">Ideas</button><button data-p="ia">IA</button><button data-p="github">GitHub</button>
     </nav>
 
     <div class="hoja" id="p-proyecto">
@@ -60,7 +60,8 @@
           <li><b>recuerdo</b>: luz dorada. <code>personaje</code>, <code>objeto</code></li>
           <li><b>cierre</b>: noche, auto detenido y créditos. <code>personaje</code></li>
           <li><b>foto</b>: imagen con zoom. <code>imagen</code>, <code>zoom: [1.05, 1.18]</code></li>
-          <li><b>video</b>: clip a pantalla completa. <code>archivo</code>, <code>inicioClip</code></li>
+          <li><b>video</b>: clip a pantalla completa (se repite si la escena es más larga). <code>archivo</code>, <code>inicioClip</code></li>
+          <li><b>Para la IA (pestaña IA)</b>: cualquier escena acepta <code>"ia": {"prompt": "descripción en inglés", "imagen": "medios/personajes/…png"}</code>. El cuaderno 3 genera la toma y convierte la escena en <b>video</b>.</li>
         </ul>
         <p class="nota">«hora» va de 0 (tarde) a 1 (noche): <code>[inicio, fin]</code> de la escena.</p>
         <p class="nota">Cualquier escena acepta <code>"filtro": "byn"</code> (blanco y negro, para recuerdos), <code>"calido"</code> o <code>"frio"</code>.</p>
@@ -147,6 +148,20 @@
       <p class="nota">Tu libreta. Se guarda en <code>ideas/ideas.md</code> dentro del repo.</p>
       <textarea id="tIdeas" rows="14"></textarea>
       <div class="fila"><button id="btnGuardarIdeas" class="primario">Guardar en GitHub</button></div>
+    </div>
+
+    <div class="hoja" id="p-ia" hidden>
+      <h2>IA en Google Colab</h2>
+      <p class="nota">Para voz natural, tu propio timbre, tomas de video realistas y labios sincronizados, el estudio usa modelos de IA abiertos que corren en las GPU de Google Colab. Cada cuaderno lee este proyecto desde GitHub y devuelve el resultado al repo.</p>
+      <ol class="ayuda">
+        <li>En Colab: <i>Entorno de ejecución → Cambiar tipo → GPU</i>.</li>
+        <li>Pon tu token de GitHub en los <b>Secretos</b> de Colab (icono de llave) con el nombre <code>GITHUB_TOKEN</code>.</li>
+        <li>Ejecuta las celdas en orden. Al terminar, vuelve aquí y pulsa «Recargar proyecto».</li>
+      </ol>
+      <div id="listaCuadernos"></div>
+      <div class="fila"><button id="btnRecargar" class="primario">Recargar proyecto</button></div>
+      <p class="nota">Si no tienes el token puesto en la pestaña GitHub, el portal espera a que GitHub Pages publique los cambios (cerca de un minuto).</p>
+      <p class="nota">Los modelos son de terceros con licencias abiertas (MIT, Apache 2.0 y OpenRAIL++). Ver <code>colab/LICENCIAS-TERCEROS.md</code>.</p>
     </div>
 
     <div class="hoja" id="p-github" hidden>

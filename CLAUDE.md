@@ -11,6 +11,7 @@ Estudio web de videos musicales con **código propio**. El dueño no quiere depe
 5. Nombres, comentarios y textos de la interfaz en español.
 6. Las escenas deben verse bien en horizontal y en vertical (`H > W`).
 7. Licencia propietaria (`LICENSE`): no agregar código con otra licencia.
+8. **Excepción: `colab/`.** Los cuadernos de Google Colab pueden instalar y ejecutar modelos de IA abiertos de terceros (solo con licencias MIT, Apache 2.0 u OpenRAIL++, listadas en `colab/LICENCIAS-TERCEROS.md`). Nada de eso se copia al repo ni entra al portal web; se descarga en Colab al usarlo. No usar modelos con licencias no comerciales (por ejemplo Wav2Lip, MusicGen, HunyuanVideo).
 
 ## Mapa
 
@@ -26,6 +27,7 @@ Estudio web de videos musicales con **código propio**. El dueño no quiere depe
 - `js/app.js` — la interfaz.
 - `proyectos/*.json` — cada video: datos, escenas, letra y análisis de voz. `proyectos/indice.json` lista los proyectos.
 - `medios/` — personajes, audio y clips. `ideas/ideas.md` — libreta del dueño.
+- `colab/` — cuadernos de IA (canción con voz, mi voz con RVC, video con Wan, labios con LatentSync) y `comun.py` (GitHub, Drive, audio, alineación de letra). Los cuadernos se generan con celdas JSON; valida su sintaxis antes de subirlos.
 
 ## Cómo agregar una escena nueva
 

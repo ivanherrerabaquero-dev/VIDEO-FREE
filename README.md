@@ -16,6 +16,7 @@ Un portal web para armar videos musicales. Todo el código es propio: HTML, CSS 
 | Medios | Quitar fondo y subir archivos |
 | Exportar | Video y portada |
 | Ideas | Libreta guardada en el repo |
+| IA | Cuadernos de Colab y recarga del proyecto |
 | GitHub | Conectar el portal con el repo |
 
 ## Abrir el portal
@@ -66,6 +67,28 @@ En la pestaña Voz, «Generar voz cantada» canta la letra con sus tiempos. Hay 
 La melodía sale de tu pista de voz analizada (con afinador automático opcional) o se compone sobre los acordes de la pista, con frases que se repiten como en una canción. La voz se mezcla con la pista, que baja un poco cuando cantas, y se descarga sola en WAV.
 
 Ningún motor es un clon de voz con IA: eso requiere modelos entrenados y servicios externos.
+
+## Inteligencia artificial en Google Colab
+
+Para lo que el código propio del navegador no alcanza (una voz humana natural, tu timbre, video realista y labios sincronizados), el estudio trae cuatro cuadernos de Google Colab en la carpeta `colab/`. Cada uno lee tu proyecto desde GitHub, usa una GPU de Colab y devuelve el resultado a tu repo. En el portal, la pestaña **IA** tiene los botones para abrirlos.
+
+| Cuaderno | Qué hace | GPU |
+|---|---|---|
+| 1 · Canción IA | Canción con voz en español | T4 |
+| 2 · Mi voz | La voz pasa a tu timbre | T4 |
+| 3 · Video IA | Tomas desde texto o imagen | L4/A100 (T4 a 480p) |
+| 4 · Labios | Boca sincronizada con el canto | L4/A100 (T4 a 256 px) |
+
+1. **Canción con voz** (ACE-Step 1.5): toma tu letra, el estilo, el BPM y la tonalidad, y genera la canción completa con voz cantando en español. Separa la voz (Demucs) y sincroniza la letra palabra por palabra (Whisper).
+2. **Mi voz** (RVC): entrenas un modelo con 10 minutos o más de tu voz limpia y la voz de la canción pasa a ser la tuya, con la misma melodía. El modelo queda en tu Drive.
+3. **Video IA** (Wan 2.2 / 2.1): crea tomas realistas de unos 5 segundos desde un texto o desde una imagen, por ejemplo tu hoja de personaje. Las pone en las escenas que tengan `"ia"`, o en todas.
+4. **Labios** (LatentSync): toma una escena donde se ve la cara del cantante y le mueve la boca al ritmo de la parte de la canción que suena en esa escena.
+
+**Para empezar:** abre el cuaderno, elige *Entorno de ejecución → Cambiar tipo → GPU* y guarda tu token de GitHub en los **Secretos** de Colab con el nombre `GITHUB_TOKEN`. Luego ejecuta las celdas en orden y, al terminar, pulsa «Recargar proyecto» en la pestaña IA del portal.
+
+**Seedance** (de ByteDance) es un modelo cerrado. No publica sus pesos y solo se usa pagando su API, así que no puede correr en Colab. Wan 2.2 es el modelo de video abierto más avanzado que se puede descargar.
+
+Estos modelos son de terceros con licencias abiertas. El detalle está en `colab/LICENCIAS-TERCEROS.md`.
 
 ## Escenas
 
@@ -124,6 +147,7 @@ js/app.js             interfaz
 proyectos/            un .json por video
 medios/               personajes, audio y clips
 ideas/ideas.md        libreta
+colab/                cuadernos de IA para Google Colab
 ```
 
 ## Licencia
