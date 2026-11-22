@@ -23,7 +23,7 @@ import requests
 REPO = os.environ.get("VIDEOFREE_REPO", "ivanherrerabaquero-dev/VIDEO-FREE")
 RAMA = os.environ.get("VIDEOFREE_RAMA", "main")
 API = "https://api.github.com"
-TRABAJO = Path("/content/trabajo")
+TRABAJO = Path(os.environ.get("VIDEOFREE_TRABAJO", "/content/trabajo"))
 _token: str | None = None
 _drive: Path | None = None
 
@@ -49,12 +49,19 @@ def preparar(repo: str = REPO, rama: str = RAMA, usar_drive: bool = True, exigir
         print(f"GPU: {g['nombre']} con {g['vram_gb']} GB")
     elif exigir_gpu:
         raise SystemExit("No hay GPU. En Colab: Entorno de ejecución → Cambiar tipo de entorno → GPU (T4, L4 o A100).")
-    try:
-        from google.colab import userdata  # type: ignore
+    _token = os.environ.get("GITHUB_TOKEN")
+    if not _token:
+        try:  # Colab: Secretos (icono de llave)
+            from google.colab import userdata  # type: ignore
 
-        _token = userdata.get("GITHUB_TOKEN")
-    except Exception:
-        _token = os.environ.get("GITHUB_TOKEN")
+            _token = userdata.get("GITHUB_TOKEN")
+        except Exception:
+            try:  # Kaggle: Add-ons → Secrets
+                from kaggle_secrets import UserSecretsClient  # type: ignore
+
+                _token = UserSecretsClient().get_secret("GITHUB_TOKEN")
+            except Exception:
+                _token = None
     print("GitHub:", f"conectado a {REPO} ({RAMA})" if _token else "sin token (solo lectura). Agrega el secreto GITHUB_TOKEN para guardar.")
     if usar_drive:
         try:
@@ -107,17 +114,33 @@ def guardar(camino: str, datos: bytes | str, mensaje: str) -> str:
         datos = datos.encode("utf-8")
     if len(datos) > 95 * 1024 * 1024:
         raise RuntimeError(f"{camino} pesa {len(datos) / 1048576:.0f} MB; GitHub acepta hasta 100 MB. Guárdalo solo en Drive.")
+    import random
+    import time
     url = f"{API}/repos/{REPO}/contents/{camino}"
-    actual = requests.get(f"{url}?ref={RAMA}", headers=_cab(), timeout=60)
-    cuerpo = {"message": mensaje, "content": base64.b64encode(datos).decode(), "branch": RAMA}
-    if actual.status_code == 200:
-        cuerpo["sha"] = actual.json()["sha"]
-    r = requests.put(url, headers=_cab(), json=cuerpo, timeout=600)
-    if r.status_code == 409:
-        raise RuntimeError("Alguien cambió ese archivo mientras tanto; vuelve a ejecutar la celda.")
+    contenido = base64.b64encode(datos).decode()
+    for intento in range(8):
+        actual = requests.get(f"{url}?ref={RAMA}", headers=_cab(), timeout=60)
+        cuerpo = {"message": mensaje, "content": contenido, "branch": RAMA}
+        if actual.status_code == 200:
+            cuerpo["sha"] = actual.json()["sha"]
+        r = requests.put(url, headers=_cab(), json=cuerpo, timeout=600)
+        if r.status_code in (409, 422) and intento < 7:
+            # varias GPU guardando a la vez en la misma rama: esperar un poco y reintentar
+            time.sleep(2 + intento * 3 + random.random() * 3)
+            continue
+        r.raise_for_status()
+        print(f"Guardado en GitHub: {camino}")
+        return r.json()["commit"]["sha"]
+    raise RuntimeError(f"No pude guardar {camino} en GitHub tras varios intentos.")
+
+
+def listar(carpeta: str) -> list[str]:
+    """Nombres de los archivos de una carpeta del repo ([] si no existe)."""
+    r = requests.get(f"{API}/repos/{REPO}/contents/{carpeta}?ref={RAMA}", headers=_cab(), timeout=60)
+    if r.status_code == 404:
+        return []
     r.raise_for_status()
-    print(f"Guardado en GitHub: {camino}")
-    return r.json()["commit"]["sha"]
+    return [x["name"] for x in r.json() if x.get("type") == "file"]
 
 
 def a_drive(local: str | Path, nombre: str | None = None) -> Path | None:
@@ -129,6 +152,32 @@ def a_drive(local: str | Path, nombre: str | None = None) -> Path | None:
     shutil.copy2(local, destino)
     print("Copia en Drive:", destino)
     return destino
+
+
+def con_cache_drive(nombre: str, carpeta: str | Path, construir) -> str:
+    """Guarda una instalación pesada (por ejemplo el entorno de LatentSync) en Drive como .tar.
+
+    La primera vez la construye y la copia a Drive (si cabe); las siguientes sesiones solo la descomprimen,
+    que es mucho más rápido que instalar de nuevo. Devuelve "local", "drive" o "nuevo"."""
+    carpeta = Path(carpeta)
+    if carpeta.exists() and any(carpeta.iterdir()):
+        return "local"
+    tar = (_drive / "cache" / f"{nombre}.tar") if _drive else None
+    if tar and tar.exists():
+        print(f"Recupero {nombre} desde Drive…")
+        sh(f'tar -xf "{tar}" -C "{carpeta.parent}"')
+        return "drive"
+    construir()
+    if tar:
+        tamano = int(subprocess.run(["du", "-sb", str(carpeta)], capture_output=True, text=True).stdout.split()[0])
+        libre = shutil.disk_usage(_drive).free
+        if tamano * 1.1 < libre:
+            tar.parent.mkdir(parents=True, exist_ok=True)
+            print(f"Guardo {nombre} en Drive ({tamano / 2**30:.1f} GB) para la próxima sesión…")
+            sh(f'tar -cf "{tar}.parcial" -C "{carpeta.parent}" "{carpeta.name}" && mv "{tar}.parcial" "{tar}"')
+        else:
+            print(f"{nombre} ocupa {tamano / 2**30:.1f} GB y en Drive quedan {libre / 2**30:.1f} GB libres: no lo guardo.")
+    return "nuevo"
 
 
 def carpeta_drive(sub: str) -> Path | None:
