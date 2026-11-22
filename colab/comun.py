@@ -244,9 +244,15 @@ def tiempos_de_palabras(audio: str | Path, idioma: str = "es", modelo: str = "la
     """Whisper (faster-whisper) con tiempos por palabra sobre la voz cantada."""
     from faster_whisper import WhisperModel  # type: ignore
 
+    import numpy as np
+
+    # El audio lo decodifica ffmpeg (16 kHz, mono): así no dependemos de la versión de PyAV que traiga Colab
+    crudo = subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(audio), "-f", "f32le", "-ac", "1", "-ar", "16000", "-"],
+                           capture_output=True, check=True).stdout
+    muestras = np.frombuffer(crudo, dtype=np.float32).copy()
     g = gpu()
     m = WhisperModel(modelo, device="cuda" if g else "cpu", compute_type="float16" if g else "int8")
-    segmentos, _ = m.transcribe(str(audio), language=idioma, word_timestamps=True, vad_filter=True)
+    segmentos, _ = m.transcribe(muestras, language=idioma, word_timestamps=True, vad_filter=True)
     return [{"p": w.word.strip(), "inicio": float(w.start), "fin": float(w.end)} for s in segmentos for w in (s.words or []) if w.word.strip()]
 
 
