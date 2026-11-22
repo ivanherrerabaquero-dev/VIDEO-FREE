@@ -22,8 +22,8 @@ from pathlib import Path
 from PIL import Image, ImageFilter
 
 # ───────────────────────── Estilo general ─────────────────────────
-ESTILO_FOTO = ("cinematic film still, shot on ARRI Alexa, 35mm anamorphic lens, natural skin texture, realistic, "
-               "highly detailed, shallow depth of field, film grain, color graded music video")
+# Corto a propósito: SDXL solo lee 77 «tokens» por prompt; lo que sobra se pierde.
+ESTILO_FOTO = "cinematic film still, 35mm, realistic skin, film grain"
 NEGATIVO_FOTO = ("cartoon, illustration, painting, 3d render, cgi, anime, plastic skin, deformed, disfigured, extra limbs, "
                  "extra fingers, bad hands, bad anatomy, blurry, low quality, text, watermark, logo, two heads, duplicate person")
 MOVIMIENTO_COMUN = "realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face"
@@ -31,7 +31,7 @@ NEGATIVO_VIDEO = ("static, frozen, still image, slideshow, blurry, low quality, 
                   "morphing face, extra fingers, poorly drawn hands, distorted car, melting, text, subtitles, watermark, logo, "
                   "overexposed, flicker")
 
-AUTO = "black 1969 convertible muscle car with chrome details"
+AUTO = "black 1969 convertible muscle car"
 
 
 def hora_texto(h: float) -> str:
