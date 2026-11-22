@@ -79,9 +79,15 @@ def preparar(repo: str = REPO, rama: str = RAMA, usar_drive: bool = True, exigir
 def sh(cmd: str, cwd: str | None = None, env: dict | None = None) -> None:
     """Ejecuta un comando mostrando su salida; falla con un mensaje claro."""
     print("$", cmd)
-    r = subprocess.run(cmd, shell=True, cwd=cwd, env={**os.environ, **(env or {})})
-    if r.returncode != 0:
-        raise RuntimeError(f"El comando falló ({r.returncode}): {cmd}")
+    # la salida pasa por print(): así Colab la muestra en la celda (con subprocess.run directo se pierde)
+    p = subprocess.Popen(cmd, shell=True, cwd=cwd, env={**os.environ, **(env or {})}, stdout=subprocess.PIPE,
+                         stderr=subprocess.STDOUT, text=True, bufsize=1)
+    ultimas = []
+    for linea in p.stdout:
+        print(linea, end="")
+        ultimas = (ultimas + [linea.rstrip()])[-15:]
+    if p.wait() != 0:
+        raise RuntimeError(f"El comando falló ({p.returncode}): {cmd}\n" + "\n".join(ultimas))
 
 
 # ───────────────────────── GitHub ─────────────────────────

@@ -445,9 +445,9 @@ class Director:
                          f'--inference_ckpt_path checkpoints/latentsync_unet.pt --inference_steps {pasos} --guidance_scale 1.5 '
                          f'--enable_deepcache --video_path "{self.tomas[n]}" --audio_path "{tramo}" --video_out_path "{crudo}"',
                          cwd=LS_DIR)
-            except RuntimeError:
-                print(f"Toma {n}: no encontré la cara en toda la toma; queda sin labios sincronizados.")
-                self._marca(f"sin_labios_{n:02d}.txt", "sin cara")
+            except RuntimeError as e:
+                print(f"Toma {n}: LatentSync no pudo con esta toma; queda sin labios sincronizados.\n{str(e)[-800:]}")
+                self._marca(f"sin_labios_{n:02d}.txt", str(e)[-500:])
                 continue
             final = self.local / f"labios_{n:02d}.mp4"
             comun.sh(f'ffmpeg -hide_banner -loglevel error -y -i "{crudo}" -c:v libx264 -crf {23 if cfg.borrador else 18} -pix_fmt yuv420p -an "{final}"')
