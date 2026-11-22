@@ -98,8 +98,15 @@ def _cab(raw: bool = False) -> dict:
     return h
 
 
+# Sin token (por ejemplo en Kaggle sin el secreto), lo que se «guarda» queda en esta carpeta, con las mismas rutas del repo,
+# y se lee de aquí primero. En Kaggle es /kaggle/working/VIDEO-FREE: aparece en «Output» y se puede descargar.
+SALIDA = os.environ.get("VIDEOFREE_SALIDA")
+
+
 def leer(camino: str) -> bytes | None:
     """Lee un archivo del repo (cualquier tamaño hasta 100 MB). None si no existe."""
+    if SALIDA and (Path(SALIDA) / camino).is_file():
+        return (Path(SALIDA) / camino).read_bytes()
     url = f"{API}/repos/{REPO}/contents/{camino}?ref={RAMA}"
     r = requests.get(url, headers=_cab(raw=True), timeout=120)
     if r.status_code == 404:
@@ -114,10 +121,16 @@ def leer(camino: str) -> bytes | None:
 
 def guardar(camino: str, datos: bytes | str, mensaje: str) -> str:
     """Crea o actualiza un archivo del repo con un commit. Devuelve el sha del commit."""
-    if not _token:
-        raise RuntimeError("Para guardar en GitHub agrega el secreto GITHUB_TOKEN (icono de llave en Colab) y vuelve a ejecutar preparar().")
     if isinstance(datos, str):
         datos = datos.encode("utf-8")
+    if not _token:
+        if SALIDA:
+            destino = Path(SALIDA) / camino
+            destino.parent.mkdir(parents=True, exist_ok=True)
+            destino.write_bytes(datos)
+            print(f"Guardado aquí (sin GitHub): {destino}")
+            return "local"
+        raise RuntimeError("Para guardar en GitHub agrega el secreto GITHUB_TOKEN (icono de llave en Colab) y vuelve a ejecutar preparar().")
     if len(datos) > 95 * 1024 * 1024:
         raise RuntimeError(f"{camino} pesa {len(datos) / 1048576:.0f} MB; GitHub acepta hasta 100 MB. Guárdalo solo en Drive.")
     import random
@@ -142,11 +155,14 @@ def guardar(camino: str, datos: bytes | str, mensaje: str) -> str:
 
 def listar(carpeta: str) -> list[str]:
     """Nombres de los archivos de una carpeta del repo ([] si no existe)."""
+    locales = []
+    if SALIDA and (Path(SALIDA) / carpeta).is_dir():
+        locales = [f.name for f in (Path(SALIDA) / carpeta).iterdir() if f.is_file()]
     r = requests.get(f"{API}/repos/{REPO}/contents/{carpeta}?ref={RAMA}", headers=_cab(), timeout=60)
-    if r.status_code == 404:
-        return []
+    if r.status_code in (404, 403):  # 403: límite de la API sin token
+        return locales
     r.raise_for_status()
-    return [x["name"] for x in r.json() if x.get("type") == "file"]
+    return sorted(set(locales) | {x["name"] for x in r.json() if x.get("type") == "file"})
 
 
 def a_drive(local: str | Path, nombre: str | None = None) -> Path | None:

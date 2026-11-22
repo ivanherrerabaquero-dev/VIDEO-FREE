@@ -108,7 +108,7 @@ class Director:
         else:
             plano = director.planear_auto(self.duracion, self.p.get("bpm") or 95, self.p.get("letra"),
                                           semilla=self.cfg.semilla, ritmo=self.cfg.ritmo)
-        if self.cfg.trabajadores > 1 or comun._token:
+        if comun._token or comun.SALIDA:
             try:
                 comun.guardar(f"{self.base}/plano.json", json.dumps(plano, ensure_ascii=False, indent=1), f"Director: plano de {self.carpeta}")
             except Exception as e:  # sin token: cada GPU calcula el mismo plano (es determinista)
@@ -150,7 +150,7 @@ class Director:
 
     def _publicar(self, local: Path, mensaje: str) -> None:
         comun.a_drive(local, f"director/{self.carpeta}/{local.name}")
-        if comun._token:
+        if comun._token or comun.SALIDA:
             try:
                 comun.guardar(f"{self.base}/{local.name}", local.read_bytes(), mensaje)
             except Exception as e:
