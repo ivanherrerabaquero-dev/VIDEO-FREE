@@ -16,12 +16,25 @@
     {
       "tipo": "video",
       "desde": 0.0,
-      "hasta": 2.526,
-      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador/toma_01.mp4",
+      "hasta": 3.789,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_01.mp4",
       "inicioClip": 0,
       "ia": {
         "director": "dron_apertura",
-        "prompt": "the drone slowly flies forward and tilts down following the car on the highway, dust behind the wheels, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "prompt": "the drone slowly flies forward and tilts down following the black open-top convertible on the highway, dust behind the wheels, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 3.789,
+      "hasta": 7.579,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_02.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "dron_apertura",
+        "prompt": "the drone slowly flies forward and tilts down following the black open-top convertible on the highway, dust behind the wheels, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
         "labios": false
       },
       "filtro": "calido"
@@ -30,11 +43,11 @@
       "tipo": "video",
       "desde": 7.579,
       "hasta": 10.105,
-      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador/toma_03.mp4",
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_03.mp4",
       "inicioClip": 0,
       "ia": {
-        "director": "canta_volante",
-        "prompt": "he sings with emotion while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "director": "sube_al_auto",
+        "prompt": "the man walks to the open-top convertible, opens the driver door, gets in and sits behind the steering wheel, natural body movement, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
         "labios": false
       },
       "filtro": "calido"
@@ -43,7 +56,124 @@
       "tipo": "video",
       "desde": 10.105,
       "hasta": 12.632,
-      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador/toma_04.mp4",
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_04.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "copiloto_tararea",
+        "prompt": "she hums softly with closed lips and a gentle smile, her long hair blows in the wind, she turns her head slowly toward the driver, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 12.632,
+      "hasta": 17.684,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_05.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_volante",
+        "prompt": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 17.684,
+      "hasta": 22.737,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_06.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "manos_volante",
+        "prompt": "the hands turn the steering wheel gently, fingers tap the rhythm of the music on the wheel, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 22.737,
+      "hasta": 27.789,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_07.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_volante",
+        "prompt": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 27.789,
+      "hasta": 32.842,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_08.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_volante",
+        "prompt": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 32.842,
+      "hasta": 37.895,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_09.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "retrovisor",
+        "prompt": "the road in the mirror reflection moves away, slight vibration of the mirror, camera fixed to the car door, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 37.895,
+      "hasta": 42.947,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_10.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_volante",
+        "prompt": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 42.947,
+      "hasta": 48.0,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_11.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_capo",
+        "prompt": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 48.0,
+      "hasta": 53.053,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_12.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_volante",
+        "prompt": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 53.053,
+      "hasta": 58.105,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_13.mp4",
       "inicioClip": 0,
       "ia": {
         "director": "copiloto_tararea",
@@ -54,76 +184,499 @@
     },
     {
       "tipo": "video",
-      "desde": 12.632,
-      "hasta": 15.158,
-      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador/toma_05.mp4",
+      "desde": 58.105,
+      "hasta": 61.895,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_14.mp4",
       "inicioClip": 0,
       "ia": {
-        "director": "manos_volante",
-        "prompt": "the hands turn the steering wheel gently, fingers tap the rhythm of the music on the wheel, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
-        "labios": false
+        "director": "canta_capo",
+        "prompt": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
       },
       "filtro": "calido"
     },
     {
       "tipo": "video",
-      "desde": 15.158,
-      "hasta": 17.684,
-      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador/toma_06.mp4",
+      "desde": 61.895,
+      "hasta": 65.684,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_15.mp4",
       "inicioClip": 0,
       "ia": {
         "director": "recuerdo_byn",
-        "prompt": "she walks slowly away through the tall grass and looks back over her shoulder, the grass sways in the wind, slow motion, dreamy, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "prompt": "she walks slowly away through the tall grass and looks back over her shoulder, the grass sways in the wind, slow motion, dreamy, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
         "labios": false
       },
       "filtro": "byn"
     },
     {
       "tipo": "video",
-      "desde": 17.684,
-      "hasta": 20.211,
-      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador/toma_07.mp4",
+      "desde": 65.684,
+      "hasta": 68.211,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_16.mp4",
       "inicioClip": 0,
       "ia": {
         "director": "canta_campo",
-        "prompt": "he sings with sadness, puts a hand on his chest, looks down and then up at the sky, slow camera push in, the grass moves in the wind, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
-        "labios": false
-      }
+        "prompt": "he sings the lyrics with sadness and clear mouth movements, puts a hand on his chest, looks down and then up at the sky, slow camera push in, the grass moves in the wind, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "calido"
     },
     {
       "tipo": "video",
-      "desde": 20.211,
-      "hasta": 22.737,
-      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador/toma_08.mp4",
+      "desde": 68.211,
+      "hasta": 73.263,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_17.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_capo",
+        "prompt": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 73.263,
+      "hasta": 78.316,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_18.mp4",
       "inicioClip": 0,
       "ia": {
         "director": "dron_atardecer",
-        "prompt": "the drone orbits slowly around the moving car, the car follows the curve of the road, headlights turn on, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "prompt": "the drone orbits slowly around the moving black open-top convertible, the car follows the curve of the road, headlights turn on, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 78.316,
+      "hasta": 83.368,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_19.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_volante",
+        "prompt": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 83.368,
+      "hasta": 88.421,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_20.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "copiloto_tararea",
+        "prompt": "she hums softly with closed lips and a gentle smile, her long hair blows in the wind, she turns her head slowly toward the driver, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 88.421,
+      "hasta": 93.474,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_21.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "dron_atardecer",
+        "prompt": "the drone orbits slowly around the moving black open-top convertible, the car follows the curve of the road, headlights turn on, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 93.474,
+      "hasta": 98.526,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_22.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_volante",
+        "prompt": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 98.526,
+      "hasta": 103.579,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_23.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "copiloto_tararea",
+        "prompt": "she hums softly with closed lips and a gentle smile, her long hair blows in the wind, she turns her head slowly toward the driver, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 103.579,
+      "hasta": 108.632,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_24.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_volante",
+        "prompt": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 108.632,
+      "hasta": 113.684,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_25.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_volante",
+        "prompt": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "calido"
+    },
+    {
+      "tipo": "video",
+      "desde": 113.684,
+      "hasta": 118.737,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_26.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_capo",
+        "prompt": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      }
+    },
+    {
+      "tipo": "video",
+      "desde": 118.737,
+      "hasta": 123.789,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_27.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "retrovisor",
+        "prompt": "the road in the mirror reflection moves away, slight vibration of the mirror, camera fixed to the car door, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
         "labios": false
       }
     },
     {
       "tipo": "video",
-      "desde": 22.737,
-      "hasta": 25.263,
-      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador/toma_09.mp4",
+      "desde": 123.789,
+      "hasta": 128.842,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_28.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_volante",
+        "prompt": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      }
+    },
+    {
+      "tipo": "video",
+      "desde": 128.842,
+      "hasta": 131.368,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_29.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_capo",
+        "prompt": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      }
+    },
+    {
+      "tipo": "video",
+      "desde": 131.368,
+      "hasta": 133.895,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_30.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_campo",
+        "prompt": "he sings the lyrics with sadness and clear mouth movements, puts a hand on his chest, looks down and then up at the sky, slow camera push in, the grass moves in the wind, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      }
+    },
+    {
+      "tipo": "video",
+      "desde": 133.895,
+      "hasta": 138.947,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_31.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "guitarra",
+        "prompt": "fingers strum the guitar strings to the beat, the strings vibrate, shallow depth of field, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      }
+    },
+    {
+      "tipo": "video",
+      "desde": 138.947,
+      "hasta": 144.0,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_32.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_capo",
+        "prompt": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      }
+    },
+    {
+      "tipo": "video",
+      "desde": 144.0,
+      "hasta": 149.053,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_33.mp4",
       "inicioClip": 0,
       "ia": {
         "director": "canta_noche",
-        "prompt": "he sings with longing, passing lights sweep across his face, he glances at the empty passenger seat, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "prompt": "he sings the lyrics with longing and clear mouth movements, passing lights sweep across his face, he glances at the empty passenger seat, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 149.053,
+      "hasta": 154.105,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_34.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "fantasma",
+        "prompt": "the ghostly woman looks at the camera, the mist moves around her, she slowly fades and dissolves into the headlights, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
         "labios": false
       },
       "filtro": "frio"
     },
     {
       "tipo": "video",
-      "desde": 25.263,
-      "hasta": 27.789,
-      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador/toma_10.mp4",
+      "desde": 154.105,
+      "hasta": 159.158,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_35.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "copiloto_tararea",
+        "prompt": "she hums softly with closed lips and a gentle smile, her long hair blows in the wind, she turns her head slowly toward the driver, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      }
+    },
+    {
+      "tipo": "video",
+      "desde": 159.158,
+      "hasta": 164.211,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_36.mp4",
       "inicioClip": 0,
       "ia": {
         "director": "fantasma",
         "prompt": "the ghostly woman looks at the camera, the mist moves around her, she slowly fades and dissolves into the headlights, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 164.211,
+      "hasta": 169.263,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_37.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_noche",
+        "prompt": "he sings the lyrics with longing and clear mouth movements, passing lights sweep across his face, he glances at the empty passenger seat, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 169.263,
+      "hasta": 174.316,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_38.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "recuerdo_byn",
+        "prompt": "she walks slowly away through the tall grass and looks back over her shoulder, the grass sways in the wind, slow motion, dreamy, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "byn"
+    },
+    {
+      "tipo": "video",
+      "desde": 174.316,
+      "hasta": 176.842,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_39.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_noche",
+        "prompt": "he sings the lyrics with longing and clear mouth movements, passing lights sweep across his face, he glances at the empty passenger seat, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 176.842,
+      "hasta": 181.895,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_40.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "copiloto_tararea",
+        "prompt": "she hums softly with closed lips and a gentle smile, her long hair blows in the wind, she turns her head slowly toward the driver, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 181.895,
+      "hasta": 185.684,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_41.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "maquina_ritmos",
+        "prompt": "fingers tap the pads to a reggaeton beat, the pads light up with each hit, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 185.684,
+      "hasta": 189.474,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_42.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "dron_atardecer",
+        "prompt": "the drone orbits slowly around the moving black open-top convertible, the car follows the curve of the road, headlights turn on, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 189.474,
+      "hasta": 194.526,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_43.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_campo",
+        "prompt": "he sings the lyrics with sadness and clear mouth movements, puts a hand on his chest, looks down and then up at the sky, slow camera push in, the grass moves in the wind, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 194.526,
+      "hasta": 197.053,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_44.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_capo",
+        "prompt": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 197.053,
+      "hasta": 199.579,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_45.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "guitarra",
+        "prompt": "fingers strum the guitar strings to the beat, the strings vibrate, shallow depth of field, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 199.579,
+      "hasta": 202.105,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_46.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_noche",
+        "prompt": "he sings the lyrics with longing and clear mouth movements, passing lights sweep across his face, he glances at the empty passenger seat, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 202.105,
+      "hasta": 204.632,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/labios_47.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "canta_noche",
+        "prompt": "he sings the lyrics with longing and clear mouth movements, passing lights sweep across his face, he glances at the empty passenger seat, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": true
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 204.632,
+      "hasta": 209.705,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_48.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "fantasma",
+        "prompt": "the ghostly woman looks at the camera, the mist moves around her, she slowly fades and dissolves into the headlights, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 209.705,
+      "hasta": 214.779,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_49.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "dron_atardecer",
+        "prompt": "the drone orbits slowly around the moving black open-top convertible, the car follows the curve of the road, headlights turn on, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 214.779,
+      "hasta": 219.853,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_50.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "fantasma",
+        "prompt": "the ghostly woman looks at the camera, the mist moves around her, she slowly fades and dissolves into the headlights, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 219.853,
+      "hasta": 224.926,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_51.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "dron_atardecer",
+        "prompt": "the drone orbits slowly around the moving black open-top convertible, the car follows the curve of the road, headlights turn on, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "labios": false
+      },
+      "filtro": "frio"
+    },
+    {
+      "tipo": "video",
+      "desde": 224.926,
+      "hasta": 230.0,
+      "archivo": "medios/director/carretera-sin-ti_horizontal_borrador_633d32/toma_52.mp4",
+      "inicioClip": 0,
+      "ia": {
+        "director": "cierre",
+        "prompt": "the man leans on the car and looks up at the stars, slow camera pull back, the headlights fade out, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
         "labios": false
       },
       "filtro": "frio"
@@ -1854,43 +2407,46 @@
         "n": 1,
         "clase": "dron_apertura",
         "desde": 0.0,
-        "hasta": 2.526,
+        "hasta": 3.789,
         "personaje": null,
         "encuadre": null,
-        "imagen": "aerial drone view high above an endless empty desert highway, a tiny black 1969 convertible muscle car driving alone, mountains on the horizon, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
-        "mueve": "the drone slowly flies forward and tilts down following the car on the highway, dust behind the wheels, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "imagen": "aerial drone view high above an endless empty desert highway, a tiny black 1969 convertible muscle car with the top down driving alone, mountains on the horizon, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the drone slowly flies forward and tilts down following the black open-top convertible on the highway, dust behind the wheels, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
         "canta": false,
         "grado": "dorado",
         "hora": 0.05,
-        "semilla": 11
+        "semilla": 18,
+        "linea": ""
       },
       {
         "n": 2,
-        "clase": "sube_al_auto",
-        "desde": 2.526,
+        "clase": "dron_apertura",
+        "desde": 3.789,
         "hasta": 7.579,
-        "personaje": "actor_cuerpo.png",
-        "encuadre": "cuerpo_izquierda",
-        "imagen": "a young man standing next to a parked black 1969 convertible muscle car on the gravel shoulder of a desert highway, full body, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
-        "mueve": "the man walks to the convertible, opens the driver door, gets in and sits behind the steering wheel, closes the door, natural body movement, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "aerial drone view high above an endless empty desert highway, a tiny black 1969 convertible muscle car with the top down driving alone, mountains on the horizon, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the drone slowly flies forward and tilts down following the black open-top convertible on the highway, dust behind the wheels, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
         "canta": false,
         "grado": "dorado",
-        "hora": 0.12,
-        "semilla": 18
+        "hora": 0.07,
+        "semilla": 25,
+        "linea": ""
       },
       {
         "n": 3,
-        "clase": "canta_volante",
+        "clase": "sube_al_auto",
         "desde": 7.579,
         "hasta": 10.105,
-        "personaje": "actor_canta.png",
-        "encuadre": "primer_plano",
-        "imagen": "close-up of a young man singing while driving a black 1969 convertible muscle car with the top down, hands on the steering wheel, desert road behind him, wind in his hair, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
-        "mueve": "he sings with emotion while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
-        "canta": true,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "wide shot from behind, a young man with messy dark brown hair and a short beard, black leather jacket, white t-shirt, dark jeans walking toward a parked black 1969 convertible muscle car with the top down on the gravel shoulder of a desert highway, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the man walks to the open-top convertible, opens the driver door, gets in and sits behind the steering wheel, natural body movement, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
         "grado": "dorado",
-        "hora": 0.27,
-        "semilla": 25
+        "hora": 0.08,
+        "semilla": 32,
+        "linea": "(Mmm, mmm, ah-ah)"
       },
       {
         "n": 4,
@@ -1899,115 +2455,740 @@
         "hasta": 12.632,
         "personaje": "actriz_sonrie.png",
         "encuadre": "medio_derecha",
-        "imagen": "a young woman sitting in the passenger seat of a black 1969 convertible muscle car with the top down, long hair, soft smile, desert highway behind, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
-        "mueve": "she hums softly with closed lips and a gentle smile, her long hair blows in the wind, she turns her head slowly toward the driver, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "imagen": "a young woman sitting in the passenger seat of a black 1969 convertible muscle car with the top down with the top down, long hair, soft smile, desert highway behind, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "she hums softly with closed lips and a gentle smile, her long hair blows in the wind, she turns her head slowly toward the driver, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
         "canta": false,
         "grado": "dorado",
-        "hora": 0.35,
-        "semilla": 32
+        "hora": 0.09,
+        "semilla": 39,
+        "linea": "Voy rodando... sin ti"
       },
       {
         "n": 5,
-        "clase": "manos_volante",
+        "clase": "canta_volante",
         "desde": 12.632,
-        "hasta": 15.158,
-        "personaje": null,
-        "encuadre": null,
-        "imagen": "close-up of a man's hands gripping the thin steering wheel of a vintage black 1969 convertible muscle car, silver ring, chrome dashboard, road ahead out of focus, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
-        "mueve": "the hands turn the steering wheel gently, fingers tap the rhythm of the music on the wheel, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
-        "canta": false,
+        "hasta": 17.684,
+        "personaje": "actor_canta.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing while driving a black 1969 convertible muscle car with the top down with the top down, hands on the steering wheel, desert road behind him, wind in his hair, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
         "grado": "dorado",
-        "hora": 0.42,
-        "semilla": 39
+        "hora": 0.1,
+        "semilla": 46,
+        "linea": "Voy rodando sin rumbo por la carretera"
       },
       {
         "n": 6,
-        "clase": "recuerdo_byn",
-        "desde": 15.158,
-        "hasta": 17.684,
-        "personaje": "actriz_mira_atras.png",
-        "encuadre": "medio_derecha",
-        "imagen": "black and white photograph, a young woman in a field of tall dry grass looking back over her shoulder, wind, soft overcast light, nostalgic memory, cinematic film still, 35mm, realistic skin, film grain",
-        "mueve": "she walks slowly away through the tall grass and looks back over her shoulder, the grass sways in the wind, slow motion, dreamy, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
-        "canta": false,
-        "grado": "byn",
-        "hora": 0.5,
-        "semilla": 46
-      },
-      {
-        "n": 7,
-        "clase": "canta_campo",
+        "clase": "manos_volante",
         "desde": 17.684,
-        "hasta": 20.211,
-        "personaje": "actor_melancolico.png",
-        "encuadre": "primer_plano",
-        "imagen": "a melancholic young man standing in a field of tall dry grass next to a parked black 1969 convertible muscle car, blue hour twilight, purple sky, first stars, cinematic film still, 35mm, realistic skin, film grain",
-        "mueve": "he sings with sadness, puts a hand on his chest, looks down and then up at the sky, slow camera push in, the grass moves in the wind, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
-        "canta": true,
-        "grado": "crepusculo",
-        "hora": 0.58,
-        "semilla": 53
-      },
-      {
-        "n": 8,
-        "clase": "dron_atardecer",
-        "desde": 20.211,
         "hasta": 22.737,
         "personaje": null,
         "encuadre": null,
-        "imagen": "aerial drone shot circling a black 1969 convertible muscle car driving on a winding mountain desert road, blue hour twilight, purple sky, first stars, cinematic film still, 35mm, realistic skin, film grain",
-        "mueve": "the drone orbits slowly around the moving car, the car follows the curve of the road, headlights turn on, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "imagen": "close-up of a man's hands gripping the thin steering wheel of a vintage black 1969 convertible muscle car with the top down, silver ring, chrome dashboard, road ahead out of focus, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the hands turn the steering wheel gently, fingers tap the rhythm of the music on the wheel, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
         "canta": false,
-        "grado": "crepusculo",
-        "hora": 0.65,
-        "semilla": 60
+        "grado": "dorado",
+        "hora": 0.12,
+        "semilla": 53,
+        "linea": "Voy rodando sin rumbo por la carretera"
+      },
+      {
+        "n": 7,
+        "clase": "canta_volante",
+        "desde": 22.737,
+        "hasta": 27.789,
+        "personaje": "actor_canta.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing while driving a black 1969 convertible muscle car with the top down with the top down, hands on the steering wheel, desert road behind him, wind in his hair, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "dorado",
+        "hora": 0.14,
+        "semilla": 60,
+        "linea": "Voy rodando sin rumbo por la carretera"
+      },
+      {
+        "n": 8,
+        "clase": "canta_volante",
+        "desde": 27.789,
+        "hasta": 32.842,
+        "personaje": "actor_canta.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing while driving a black 1969 convertible muscle car with the top down with the top down, hands on the steering wheel, desert road behind him, wind in his hair, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "dorado",
+        "hora": 0.16,
+        "semilla": 67,
+        "linea": "buscando tu sombra en cada frontera"
       },
       {
         "n": 9,
-        "clase": "canta_noche",
-        "desde": 22.737,
-        "hasta": 25.263,
-        "personaje": "actor_perfil.png",
-        "encuadre": "primer_plano",
-        "imagen": "close-up of a young man singing at night inside a black 1969 convertible muscle car, face lit by the warm dashboard glow and passing street lights, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
-        "mueve": "he sings with longing, passing lights sweep across his face, he glances at the empty passenger seat, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
-        "canta": true,
-        "grado": "noche",
-        "hora": 0.9,
-        "semilla": 67
+        "clase": "retrovisor",
+        "desde": 32.842,
+        "hasta": 37.895,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "close-up of the chrome side mirror of a black 1969 convertible muscle car with the top down, the reflection shows the empty highway behind, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the road in the mirror reflection moves away, slight vibration of the mirror, camera fixed to the car door, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "dorado",
+        "hora": 0.19,
+        "semilla": 74,
+        "linea": "el sol se despide y tú no regresas"
       },
       {
         "n": 10,
+        "clase": "canta_volante",
+        "desde": 37.895,
+        "hasta": 42.947,
+        "personaje": "actor_canta.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing while driving a black 1969 convertible muscle car with the top down with the top down, hands on the steering wheel, desert road behind him, wind in his hair, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "dorado",
+        "hora": 0.21,
+        "semilla": 81,
+        "linea": "me quedan tus besos y tus promesas"
+      },
+      {
+        "n": 11,
+        "clase": "canta_capo",
+        "desde": 42.947,
+        "hasta": 48.0,
+        "personaje": "actor_canta.png",
+        "encuadre": "medio_izquierda",
+        "imagen": "a young man singing while sitting on the hood of a parked black 1969 convertible muscle car with the top down at a desert roadside, mountains behind, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "dorado",
+        "hora": 0.23,
+        "semilla": 88,
+        "linea": "En el asiento vacío todavía estás"
+      },
+      {
+        "n": 12,
+        "clase": "canta_volante",
+        "desde": 48.0,
+        "hasta": 53.053,
+        "personaje": "actor_canta.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing while driving a black 1969 convertible muscle car with the top down with the top down, hands on the steering wheel, desert road behind him, wind in his hair, warm golden hour afternoon light, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, warm golden hour afternoon light, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "dorado",
+        "hora": 0.25,
+        "semilla": 95,
+        "linea": "tu perfume en el viento no se quiere marchar"
+      },
+      {
+        "n": 13,
+        "clase": "copiloto_tararea",
+        "desde": 53.053,
+        "hasta": 58.105,
+        "personaje": "actriz_sonrie.png",
+        "encuadre": "medio_derecha",
+        "imagen": "a young woman sitting in the passenger seat of a black 1969 convertible muscle car with the top down with the top down, long hair, soft smile, desert highway behind, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "she hums softly with closed lips and a gentle smile, her long hair blows in the wind, she turns her head slowly toward the driver, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "dorado",
+        "hora": 0.27,
+        "semilla": 102,
+        "linea": "le subo a la radio pa' no recordar"
+      },
+      {
+        "n": 14,
+        "clase": "canta_capo",
+        "desde": 58.105,
+        "hasta": 61.895,
+        "personaje": "actor_canta.png",
+        "encuadre": "medio_izquierda",
+        "imagen": "a young man singing while sitting on the hood of a parked black 1969 convertible muscle car with the top down at a desert roadside, mountains behind, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "dorado",
+        "hora": 0.29,
+        "semilla": 109,
+        "linea": "que esta noche otra vez me vas a faltar"
+      },
+      {
+        "n": 15,
+        "clase": "recuerdo_byn",
+        "desde": 61.895,
+        "hasta": 65.684,
+        "personaje": "actriz_mira_atras.png",
+        "encuadre": "medio_derecha",
+        "imagen": "black and white photograph, a young woman in a field of tall dry grass looking back over her shoulder, wind, soft overcast light, nostalgic memory, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "she walks slowly away through the tall grass and looks back over her shoulder, the grass sways in the wind, slow motion, dreamy, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "byn",
+        "hora": 0.31,
+        "semilla": 116,
+        "linea": "que esta noche otra vez me vas a faltar"
+      },
+      {
+        "n": 16,
+        "clase": "canta_campo",
+        "desde": 65.684,
+        "hasta": 68.211,
+        "personaje": "actor_melancolico.png",
+        "encuadre": "primer_plano",
+        "imagen": "a melancholic young man standing in a field of tall dry grass next to a parked black 1969 convertible muscle car with the top down, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with sadness and clear mouth movements, puts a hand on his chest, looks down and then up at the sky, slow camera push in, the grass moves in the wind, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "dorado",
+        "hora": 0.32,
+        "semilla": 123,
+        "linea": "De día te busco, de noche te nombro"
+      },
+      {
+        "n": 17,
+        "clase": "canta_capo",
+        "desde": 68.211,
+        "hasta": 73.263,
+        "personaje": "actor_canta.png",
+        "encuadre": "medio_izquierda",
+        "imagen": "a young man singing while sitting on the hood of a parked black 1969 convertible muscle car with the top down at a desert roadside, mountains behind, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "dorado",
+        "hora": 0.33,
+        "semilla": 130,
+        "linea": "y tu silueta se pierde en el humo"
+      },
+      {
+        "n": 18,
+        "clase": "dron_atardecer",
+        "desde": 73.263,
+        "hasta": 78.316,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "aerial drone shot circling a black 1969 convertible muscle car with the top down driving on a winding mountain desert road, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the drone orbits slowly around the moving black open-top convertible, the car follows the curve of the road, headlights turn on, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "dorado",
+        "hora": 0.35,
+        "semilla": 137,
+        "linea": "sé que ya no estás, pero sigo manejando"
+      },
+      {
+        "n": 19,
+        "clase": "canta_volante",
+        "desde": 78.316,
+        "hasta": 83.368,
+        "personaje": "actor_canta.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing while driving a black 1969 convertible muscle car with the top down with the top down, hands on the steering wheel, desert road behind him, wind in his hair, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "dorado",
+        "hora": 0.37,
+        "semilla": 144,
+        "linea": "por esta carretera sin ti, sin ti, llorando"
+      },
+      {
+        "n": 20,
+        "clase": "copiloto_tararea",
+        "desde": 83.368,
+        "hasta": 88.421,
+        "personaje": "actriz_sonrie.png",
+        "encuadre": "medio_derecha",
+        "imagen": "a young woman sitting in the passenger seat of a black 1969 convertible muscle car with the top down with the top down, long hair, soft smile, desert highway behind, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "she hums softly with closed lips and a gentle smile, her long hair blows in the wind, she turns her head slowly toward the driver, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "dorado",
+        "hora": 0.39,
+        "semilla": 151,
+        "linea": "(Carretera sin ti, carretera sin ti)"
+      },
+      {
+        "n": 21,
+        "clase": "dron_atardecer",
+        "desde": 88.421,
+        "hasta": 93.474,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "aerial drone shot circling a black 1969 convertible muscle car with the top down driving on a winding mountain desert road, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the drone orbits slowly around the moving black open-top convertible, the car follows the curve of the road, headlights turn on, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "dorado",
+        "hora": 0.42,
+        "semilla": 158,
+        "linea": ""
+      },
+      {
+        "n": 22,
+        "clase": "canta_volante",
+        "desde": 93.474,
+        "hasta": 98.526,
+        "personaje": "actor_canta.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing while driving a black 1969 convertible muscle car with the top down with the top down, hands on the steering wheel, desert road behind him, wind in his hair, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "dorado",
+        "hora": 0.44,
+        "semilla": 165,
+        "linea": "El motor me habla con tu misma voz"
+      },
+      {
+        "n": 23,
+        "clase": "copiloto_tararea",
+        "desde": 98.526,
+        "hasta": 103.579,
+        "personaje": "actriz_sonrie.png",
+        "encuadre": "medio_derecha",
+        "imagen": "a young woman sitting in the passenger seat of a black 1969 convertible muscle car with the top down with the top down, long hair, soft smile, desert highway behind, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "she hums softly with closed lips and a gentle smile, her long hair blows in the wind, she turns her head slowly toward the driver, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "dorado",
+        "hora": 0.46,
+        "semilla": 172,
+        "linea": "el espejo me enseña lo que fuimos los dos"
+      },
+      {
+        "n": 24,
+        "clase": "canta_volante",
+        "desde": 103.579,
+        "hasta": 108.632,
+        "personaje": "actor_canta.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing while driving a black 1969 convertible muscle car with the top down with the top down, hands on the steering wheel, desert road behind him, wind in his hair, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "dorado",
+        "hora": 0.48,
+        "semilla": 179,
+        "linea": "cada kilómetro duele un poquito más"
+      },
+      {
+        "n": 25,
+        "clase": "canta_volante",
+        "desde": 108.632,
+        "hasta": 113.684,
+        "personaje": "actor_canta.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing while driving a black 1969 convertible muscle car with the top down with the top down, hands on the steering wheel, desert road behind him, wind in his hair, sunset, orange sky, long shadows, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, sunset, orange sky, long shadows, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "dorado",
+        "hora": 0.5,
+        "semilla": 186,
+        "linea": "y en cada curva te vuelvo a encontrar"
+      },
+      {
+        "n": 26,
+        "clase": "canta_capo",
+        "desde": 113.684,
+        "hasta": 118.737,
+        "personaje": "actor_canta.png",
+        "encuadre": "medio_izquierda",
+        "imagen": "a young man singing while sitting on the hood of a parked black 1969 convertible muscle car with the top down at a desert roadside, mountains behind, blue hour twilight, purple sky, first stars, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "crepusculo",
+        "hora": 0.52,
+        "semilla": 193,
+        "linea": "Se encienden las estrellas y yo sin final"
+      },
+      {
+        "n": 27,
+        "clase": "retrovisor",
+        "desde": 118.737,
+        "hasta": 123.789,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "close-up of the chrome side mirror of a black 1969 convertible muscle car with the top down, the reflection shows the empty highway behind, blue hour twilight, purple sky, first stars, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the road in the mirror reflection moves away, slight vibration of the mirror, camera fixed to the car door, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "crepusculo",
+        "hora": 0.54,
+        "semilla": 200,
+        "linea": "con el tanque lleno y el alma en el suelo"
+      },
+      {
+        "n": 28,
+        "clase": "canta_volante",
+        "desde": 123.789,
+        "hasta": 128.842,
+        "personaje": "actor_canta.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing while driving a black 1969 convertible muscle car with the top down with the top down, hands on the steering wheel, desert road behind him, wind in his hair, blue hour twilight, purple sky, first stars, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with clear mouth movements while driving, eyebrows rise, eyes close for a moment then look at the road, wind moves his hair, the background road moves past, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "crepusculo",
+        "hora": 0.56,
+        "semilla": 207,
+        "linea": "si me ves pasar, mírame una vez más"
+      },
+      {
+        "n": 29,
+        "clase": "canta_capo",
+        "desde": 128.842,
+        "hasta": 131.368,
+        "personaje": "actor_canta.png",
+        "encuadre": "medio_izquierda",
+        "imagen": "a young man singing while sitting on the hood of a parked black 1969 convertible muscle car with the top down at a desert roadside, mountains behind, blue hour twilight, purple sky, first stars, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "crepusculo",
+        "hora": 0.58,
+        "semilla": 214,
+        "linea": "que todavía te espero"
+      },
+      {
+        "n": 30,
+        "clase": "canta_campo",
+        "desde": 131.368,
+        "hasta": 133.895,
+        "personaje": "actor_melancolico.png",
+        "encuadre": "primer_plano",
+        "imagen": "a melancholic young man standing in a field of tall dry grass next to a parked black 1969 convertible muscle car with the top down, blue hour twilight, purple sky, first stars, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with sadness and clear mouth movements, puts a hand on his chest, looks down and then up at the sky, slow camera push in, the grass moves in the wind, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "crepusculo",
+        "hora": 0.59,
+        "semilla": 221,
+        "linea": "De día te busco, de noche te nombro"
+      },
+      {
+        "n": 31,
+        "clase": "guitarra",
+        "desde": 133.895,
+        "hasta": 138.947,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "close-up of hands strumming a nylon string acoustic guitar sitting on the hood of a black 1969 convertible muscle car with the top down parked on a desert roadside, blue hour twilight, purple sky, first stars, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "fingers strum the guitar strings to the beat, the strings vibrate, shallow depth of field, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "crepusculo",
+        "hora": 0.6,
+        "semilla": 228,
+        "linea": "y tu silueta se pierde en el humo"
+      },
+      {
+        "n": 32,
+        "clase": "canta_capo",
+        "desde": 138.947,
+        "hasta": 144.0,
+        "personaje": "actor_canta.png",
+        "encuadre": "medio_izquierda",
+        "imagen": "a young man singing while sitting on the hood of a parked black 1969 convertible muscle car with the top down at a desert roadside, mountains behind, blue hour twilight, purple sky, first stars, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "crepusculo",
+        "hora": 0.62,
+        "semilla": 235,
+        "linea": "sé que ya no estás, pero sigo manejando"
+      },
+      {
+        "n": 33,
+        "clase": "canta_noche",
+        "desde": 144.0,
+        "hasta": 149.053,
+        "personaje": "actor_perfil.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing at night inside a black 1969 convertible muscle car with the top down, face lit by the warm dashboard glow and passing street lights, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with longing and clear mouth movements, passing lights sweep across his face, he glances at the empty passenger seat, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "noche",
+        "hora": 0.9,
+        "semilla": 242,
+        "linea": "por esta carretera sin ti, sin ti, llorando"
+      },
+      {
+        "n": 34,
         "clase": "fantasma",
-        "desde": 25.263,
-        "hasta": 27.789,
-        "personaje": "actriz_cuerpo.png",
-        "encuadre": "cuerpo_derecha",
-        "imagen": "a translucent ghostly young woman standing in the middle of an empty desert highway at night, lit by car headlights, mist, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "desde": 149.053,
+        "hasta": 154.105,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "a translucent ghostly figure of a young woman with long wavy brown hair, black blazer, dark red shirt and tie in the middle of an empty desert highway at night, lit by car headlights, mist, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
         "mueve": "the ghostly woman looks at the camera, the mist moves around her, she slowly fades and dissolves into the headlights, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
         "canta": false,
         "grado": "fantasma",
         "hora": 0.95,
-        "semilla": 74
+        "semilla": 249,
+        "linea": "(Carretera sin ti, carretera sin ti)"
       },
       {
-        "n": 11,
+        "n": 35,
+        "clase": "copiloto_tararea",
+        "desde": 154.105,
+        "hasta": 159.158,
+        "personaje": "actriz_sonrie.png",
+        "encuadre": "medio_derecha",
+        "imagen": "a young woman sitting in the passenger seat of a black 1969 convertible muscle car with the top down with the top down, long hair, soft smile, desert highway behind, blue hour twilight, purple sky, first stars, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "she hums softly with closed lips and a gentle smile, her long hair blows in the wind, she turns her head slowly toward the driver, blue hour twilight, purple sky, first stars, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "crepusculo",
+        "hora": 0.69,
+        "semilla": 256,
+        "linea": "(Mmm, mmm, ah-ah)"
+      },
+      {
+        "n": 36,
+        "clase": "fantasma",
+        "desde": 159.158,
+        "hasta": 164.211,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "a translucent ghostly figure of a young woman with long wavy brown hair, black blazer, dark red shirt and tie in the middle of an empty desert highway at night, lit by car headlights, mist, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the ghostly woman looks at the camera, the mist moves around her, she slowly fades and dissolves into the headlights, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "fantasma",
+        "hora": 0.95,
+        "semilla": 263,
+        "linea": "(Mmm, mmm, ah-ah)"
+      },
+      {
+        "n": 37,
+        "clase": "canta_noche",
+        "desde": 164.211,
+        "hasta": 169.263,
+        "personaje": "actor_perfil.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing at night inside a black 1969 convertible muscle car with the top down, face lit by the warm dashboard glow and passing street lights, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with longing and clear mouth movements, passing lights sweep across his face, he glances at the empty passenger seat, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "noche",
+        "hora": 0.9,
+        "semilla": 270,
+        "linea": "Si eres un recuerdo, no te vayas todavía"
+      },
+      {
+        "n": 38,
+        "clase": "recuerdo_byn",
+        "desde": 169.263,
+        "hasta": 174.316,
+        "personaje": "actriz_mira_atras.png",
+        "encuadre": "medio_derecha",
+        "imagen": "black and white photograph, a young woman in a field of tall dry grass looking back over her shoulder, wind, soft overcast light, nostalgic memory, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "she walks slowly away through the tall grass and looks back over her shoulder, the grass sways in the wind, slow motion, dreamy, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "byn",
+        "hora": 0.75,
+        "semilla": 277,
+        "linea": "Si eres un recuerdo, no te vayas todavía"
+      },
+      {
+        "n": 39,
+        "clase": "canta_noche",
+        "desde": 174.316,
+        "hasta": 176.842,
+        "personaje": "actor_perfil.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing at night inside a black 1969 convertible muscle car with the top down, face lit by the warm dashboard glow and passing street lights, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with longing and clear mouth movements, passing lights sweep across his face, he glances at the empty passenger seat, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "noche",
+        "hora": 0.9,
+        "semilla": 284,
+        "linea": "quédate en el asiento hasta que salga el día"
+      },
+      {
+        "n": 40,
+        "clase": "copiloto_tararea",
+        "desde": 176.842,
+        "hasta": 181.895,
+        "personaje": "actriz_sonrie.png",
+        "encuadre": "medio_derecha",
+        "imagen": "a young woman sitting in the passenger seat of a black 1969 convertible muscle car with the top down with the top down, long hair, soft smile, desert highway behind, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "she hums softly with closed lips and a gentle smile, her long hair blows in the wind, she turns her head slowly toward the driver, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "noche",
+        "hora": 0.78,
+        "semilla": 291,
+        "linea": "(Mmm, mmm)"
+      },
+      {
+        "n": 41,
+        "clase": "maquina_ritmos",
+        "desde": 181.895,
+        "hasta": 185.684,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "close-up of fingers tapping the glowing pads of a drum machine on the passenger seat of a vintage car at night, neon reflections, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "fingers tap the pads to a reggaeton beat, the pads light up with each hit, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "noche",
+        "hora": 0.8,
+        "semilla": 298,
+        "linea": "De día te busco, de noche te nombro"
+      },
+      {
+        "n": 42,
+        "clase": "dron_atardecer",
+        "desde": 185.684,
+        "hasta": 189.474,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "aerial drone shot circling a black 1969 convertible muscle car with the top down driving on a winding mountain desert road, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the drone orbits slowly around the moving black open-top convertible, the car follows the curve of the road, headlights turn on, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "noche",
+        "hora": 0.82,
+        "semilla": 305,
+        "linea": "De día te busco, de noche te nombro"
+      },
+      {
+        "n": 43,
+        "clase": "canta_campo",
+        "desde": 189.474,
+        "hasta": 194.526,
+        "personaje": "actor_melancolico.png",
+        "encuadre": "primer_plano",
+        "imagen": "a melancholic young man standing in a field of tall dry grass next to a parked black 1969 convertible muscle car with the top down, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with sadness and clear mouth movements, puts a hand on his chest, looks down and then up at the sky, slow camera push in, the grass moves in the wind, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "noche",
+        "hora": 0.83,
+        "semilla": 312,
+        "linea": "y tu silueta se pierde en el humo"
+      },
+      {
+        "n": 44,
+        "clase": "canta_capo",
+        "desde": 194.526,
+        "hasta": 197.053,
+        "personaje": "actor_canta.png",
+        "encuadre": "medio_izquierda",
+        "imagen": "a young man singing while sitting on the hood of a parked black 1969 convertible muscle car with the top down at a desert roadside, mountains behind, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with passion and clear mouth movements, gestures with one hand, slow camera arc around him, wind in his hair, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "noche",
+        "hora": 0.85,
+        "semilla": 319,
+        "linea": "sé que ya no estás, pero sigo manejando"
+      },
+      {
+        "n": 45,
+        "clase": "guitarra",
+        "desde": 197.053,
+        "hasta": 199.579,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "close-up of hands strumming a nylon string acoustic guitar sitting on the hood of a black 1969 convertible muscle car with the top down parked on a desert roadside, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "fingers strum the guitar strings to the beat, the strings vibrate, shallow depth of field, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "noche",
+        "hora": 0.86,
+        "semilla": 326,
+        "linea": "por esta carretera sin ti"
+      },
+      {
+        "n": 46,
+        "clase": "canta_noche",
+        "desde": 199.579,
+        "hasta": 202.105,
+        "personaje": "actor_perfil.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing at night inside a black 1969 convertible muscle car with the top down, face lit by the warm dashboard glow and passing street lights, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with longing and clear mouth movements, passing lights sweep across his face, he glances at the empty passenger seat, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "noche",
+        "hora": 0.9,
+        "semilla": 333,
+        "linea": "Sin ti... (mmm)"
+      },
+      {
+        "n": 47,
+        "clase": "canta_noche",
+        "desde": 202.105,
+        "hasta": 204.632,
+        "personaje": "actor_perfil.png",
+        "encuadre": "primer_plano",
+        "imagen": "close-up of a young man singing at night inside a black 1969 convertible muscle car with the top down, face lit by the warm dashboard glow and passing street lights, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "he sings the lyrics with longing and clear mouth movements, passing lights sweep across his face, he glances at the empty passenger seat, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": true,
+        "grado": "noche",
+        "hora": 0.9,
+        "semilla": 340,
+        "linea": "Carretera sin ti"
+      },
+      {
+        "n": 48,
+        "clase": "fantasma",
+        "desde": 204.632,
+        "hasta": 209.705,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "a translucent ghostly figure of a young woman with long wavy brown hair, black blazer, dark red shirt and tie in the middle of an empty desert highway at night, lit by car headlights, mist, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the ghostly woman looks at the camera, the mist moves around her, she slowly fades and dissolves into the headlights, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "fantasma",
+        "hora": 0.95,
+        "semilla": 347,
+        "linea": ""
+      },
+      {
+        "n": 49,
+        "clase": "dron_atardecer",
+        "desde": 209.705,
+        "hasta": 214.779,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "aerial drone shot circling a black 1969 convertible muscle car with the top down driving on a winding mountain desert road, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the drone orbits slowly around the moving black open-top convertible, the car follows the curve of the road, headlights turn on, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "noche",
+        "hora": 0.92,
+        "semilla": 354,
+        "linea": ""
+      },
+      {
+        "n": 50,
+        "clase": "fantasma",
+        "desde": 214.779,
+        "hasta": 219.853,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "a translucent ghostly figure of a young woman with long wavy brown hair, black blazer, dark red shirt and tie in the middle of an empty desert highway at night, lit by car headlights, mist, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the ghostly woman looks at the camera, the mist moves around her, she slowly fades and dissolves into the headlights, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "fantasma",
+        "hora": 0.95,
+        "semilla": 361,
+        "linea": ""
+      },
+      {
+        "n": 51,
+        "clase": "dron_atardecer",
+        "desde": 219.853,
+        "hasta": 224.926,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "aerial drone shot circling a black 1969 convertible muscle car with the top down driving on a winding mountain desert road, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "mueve": "the drone orbits slowly around the moving black open-top convertible, the car follows the curve of the road, headlights turn on, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
+        "canta": false,
+        "grado": "noche",
+        "hora": 0.96,
+        "semilla": 368,
+        "linea": ""
+      },
+      {
+        "n": 52,
         "clase": "cierre",
-        "desde": 27.789,
-        "hasta": 32.0,
-        "personaje": "actor_cuerpo.png",
-        "encuadre": "cuerpo_izquierda",
-        "imagen": "wide shot, a black 1969 convertible muscle car stopped on the shoulder of a desert highway at night under a sky full of stars, a young man standing beside it, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
+        "desde": 224.926,
+        "hasta": 230.0,
+        "personaje": null,
+        "encuadre": null,
+        "imagen": "wide shot, a black 1969 convertible muscle car with the top down stopped on the shoulder of a desert highway under a sky full of stars, a young man with messy dark brown hair and a short beard, black leather jacket, white t-shirt, dark jeans leaning on it seen from the side, night, moonlight, car headlights and dashboard glow, cinematic film still, 35mm, realistic skin, film grain",
         "mueve": "the man leans on the car and looks up at the stars, slow camera pull back, the headlights fade out, night, moonlight, car headlights and dashboard glow, realistic natural human motion, cinematic camera movement, music video, highly detailed, consistent face",
         "canta": false,
         "grado": "noche",
         "hora": 1.0,
-        "semilla": 81
+        "semilla": 375,
+        "linea": ""
       }
     ],
     "formato": "horizontal",
-    "video": "medios/videos/carretera-sin-ti_director_horizontal_borrador.mp4",
-    "carpeta": "medios/director/carretera-sin-ti_horizontal_borrador",
+    "video": "https://github.com/ivanherrerabaquero-dev/VIDEO-FREE/releases/download/director-carretera-sin-ti_horizontal_borrador_633d32/carretera-sin-ti_director_horizontal_borrador.mp4",
+    "video_completo": "https://github.com/ivanherrerabaquero-dev/VIDEO-FREE/releases/download/director-carretera-sin-ti_horizontal_borrador_633d32/carretera-sin-ti_director_horizontal_borrador.mp4",
+    "release": "director-carretera-sin-ti_horizontal_borrador_633d32",
+    "carpeta": "medios/director/carretera-sin-ti_horizontal_borrador_633d32",
     "config": {
       "proyecto": "carretera-sin-ti.json",
       "formato": "horizontal",
@@ -2021,7 +3202,8 @@
       "pasos_imagen": 30,
       "pasos_video": 0,
       "labios": true,
-      "pasos_labios": 20
+      "pasos_labios": 20,
+      "solo_labios": true
     }
   },
   "letra_anterior": [
