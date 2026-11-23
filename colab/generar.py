@@ -546,14 +546,19 @@ class Director:
         # 2) una copia en el repo para el portal, solo si cabe (GitHub no acepta archivos de más de 100 MB)
         destino = None
         final = salida
-        if salida.stat().st_size > 90 * 2**20 and self.duracion <= 8 * 60:
+        if salida.stat().st_size > 20 * 2**20 and self.duracion <= 8 * 60:
             final = salida.with_name(salida.stem + "_liviano.mp4")
             comun.sh(f'ffmpeg -hide_banner -loglevel error -y -i "{salida}" -c:v libx264 -crf 26 -preset medium -c:a copy -movflags +faststart "{final}"')
-        if final.stat().st_size <= 90 * 2**20:
-            destino = f"medios/videos/{salida.name}"
-            comun.guardar(destino, final.read_bytes(), f"Video director: {self.p.get('titulo')} ({self.carpeta})")
-        else:
-            print("El video es muy largo para el repo; queda en el release:", enlace)
+        # la API de archivos de GitHub rechaza envíos grandes (422 con ~40 MB): el repo solo guarda copias livianas
+        if final.stat().st_size <= 20 * 2**20:
+            try:
+                destino = f"medios/videos/{salida.name}"
+                comun.guardar(destino, final.read_bytes(), f"Video director: {self.p.get('titulo')} ({self.carpeta})")
+            except Exception as e:  # noqa: BLE001
+                destino = None
+                print("No pude dejar la copia en el repo (queda en el release):", str(e)[:150])
+        if not destino:
+            print("El video completo queda en el release:", enlace)
         # las escenas del portal apuntan a cada toma: solo para videos cortos (en uno de 30 min serían cientos de archivos)
         if poner_en_escenas and len(self.plano) > 80:
             print(f"No pongo las {len(self.plano)} tomas como escenas del portal (son demasiadas); el video completo queda guardado.")
