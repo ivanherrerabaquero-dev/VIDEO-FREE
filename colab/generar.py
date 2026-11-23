@@ -444,6 +444,8 @@ class Director:
         from huggingface_hub import hf_hub_download
         for f in ["whisper/tiny.pt", "latentsync_unet.pt"]:
             hf_hub_download(f"ByteDance/LatentSync-{version}", f, local_dir=f"{LS_DIR}/checkpoints")
+        # la carpeta de sus modelos auxiliares se crea antes: si dos GPU la crean a la vez, una fallaba con FileExistsError
+        os.makedirs(f"{LS_DIR}/checkpoints/auxiliary/models", exist_ok=True)
         return version, config
 
     def labios(self) -> dict[int, Path]:
@@ -472,11 +474,15 @@ class Director:
             tramo = self.local / f"tramo_{n:02d}.wav"
             comun.sh(f'ffmpeg -hide_banner -loglevel error -y -ss {t["desde"]} -to {t["hasta"]} -i "{voz}" -ac 1 -ar 16000 "{tramo}"')
             crudo = self.local / f"labios_{n:02d}_crudo.mp4"
+            orden = (f'{LS_ENV}/bin/python -m scripts.inference --unet_config_path "{config}" '
+                     f'--inference_ckpt_path checkpoints/latentsync_unet.pt --inference_steps {pasos} --guidance_scale 1.5 '
+                     f'--enable_deepcache --video_path "{self.tomas[n]}" --audio_path "{tramo}" --video_out_path "{crudo}"')
             try:
-                comun.sh(f'{LS_ENV}/bin/python -m scripts.inference --unet_config_path "{config}" '
-                         f'--inference_ckpt_path checkpoints/latentsync_unet.pt --inference_steps {pasos} --guidance_scale 1.5 '
-                         f'--enable_deepcache --video_path "{self.tomas[n]}" --audio_path "{tramo}" --video_out_path "{crudo}"',
-                         cwd=LS_DIR, env=ENTORNO_LS)
+                try:
+                    comun.sh(orden, cwd=LS_DIR, env=ENTORNO_LS)
+                except RuntimeError:  # un segundo intento: la primera vez puede chocar con la otra GPU al bajar sus modelos
+                    time.sleep(20)
+                    comun.sh(orden, cwd=LS_DIR, env=ENTORNO_LS)
             except RuntimeError as e:
                 print(f"Toma {n}: LatentSync no pudo con esta toma; queda sin labios sincronizados.\n{str(e)[-800:]}")
                 self._marca(f"sin_labios_{n:02d}.txt", str(e)[-500:])
