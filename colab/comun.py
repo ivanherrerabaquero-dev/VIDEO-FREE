@@ -504,6 +504,30 @@ def _cargar_cuda_de_pip() -> None:
             pass
 
 
+def _audio_16k(audio: str | Path):
+    """Audio en 16 kHz mono como arreglo float32, decodificado con ffmpeg (sin depender de PyAV)."""
+    import numpy as np
+    crudo = subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(audio), "-f", "f32le", "-ac", "1", "-ar", "16000", "-"],
+                           capture_output=True, check=True).stdout
+    return np.frombuffer(crudo, dtype=np.float32).copy()
+
+
+def liberar_gpu() -> None:
+    """Suelta la memoria de la GPU, también la que retiene el último error de una celda (guarda el modelo que falló)."""
+    import gc
+    import sys
+    for nombre in ("last_traceback", "last_value", "last_type", "last_exc"):
+        if hasattr(sys, nombre):
+            setattr(sys, nombre, None)
+    gc.collect()
+    try:
+        import torch
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    except Exception:  # noqa: BLE001
+        pass
+
+
 def _palabras_faster_whisper(audio: str | Path, idioma: str, pista: str | None) -> list[dict]:
     """faster-whisper (MIT, SYSTRAN): más rápido y con filtro de voz (VAD). Se instala al usarlo."""
     import importlib.util
@@ -512,8 +536,10 @@ def _palabras_faster_whisper(audio: str | Path, idioma: str, pista: str | None) 
     _cargar_cuda_de_pip()
     from faster_whisper import WhisperModel  # type: ignore
     g = gpu()
+    # el audio lo decodifica ffmpeg: la versión de PyAV que trae Kaggle no es compatible con faster-whisper
+    muestras = _audio_16k(audio)
     modelo = WhisperModel("large-v3-turbo", device="cuda" if g else "cpu", compute_type="float16" if g else "int8")
-    segmentos, _ = modelo.transcribe(str(audio), language=idioma, word_timestamps=True, vad_filter=True,
+    segmentos, _ = modelo.transcribe(muestras, language=idioma, word_timestamps=True, vad_filter=True,
                                      initial_prompt=pista, condition_on_previous_text=False, beam_size=5)
     palabras = [{"p": w.word.strip(), "inicio": float(w.start), "fin": float(w.end)}
                 for seg in segmentos for w in (seg.words or []) if w.word.strip()]
@@ -522,17 +548,15 @@ def _palabras_faster_whisper(audio: str | Path, idioma: str, pista: str | None) 
 
 
 def _palabras_transformers(audio: str | Path, idioma: str, modelo: str) -> list[dict]:
-    import numpy as np
     import torch
     from transformers import pipeline  # type: ignore
 
-    # El audio lo decodifica ffmpeg (16 kHz, mono): así no dependemos de la versión de PyAV que traiga Colab
-    crudo = subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(audio), "-f", "f32le", "-ac", "1", "-ar", "16000", "-"],
-                           capture_output=True, check=True).stdout
-    muestras = np.frombuffer(crudo, dtype=np.float32).copy()
+    muestras = _audio_16k(audio)
     g = gpu()
-    asr = pipeline("automatic-speech-recognition", model=modelo, torch_dtype=torch.float16 if g else torch.float32, device=0 if g else -1)
-    r = asr({"raw": muestras, "sampling_rate": 16000}, return_timestamps="word", chunk_length_s=30, batch_size=8,
+    # con dos GPU (Kaggle) usa la que tenga más memoria libre
+    disp = max(range(torch.cuda.device_count()), key=lambda i: torch.cuda.mem_get_info(i)[0]) if g else -1
+    asr = pipeline("automatic-speech-recognition", model=modelo, torch_dtype=torch.float16 if g else torch.float32, device=disp)
+    r = asr({"raw": muestras, "sampling_rate": 16000}, return_timestamps="word", chunk_length_s=30, batch_size=4,
             generate_kwargs={"language": idioma, "task": "transcribe"})
     palabras = []
     for ch in r.get("chunks", []):
@@ -555,6 +579,7 @@ def tiempos_de_palabras(audio: str | Path, idioma: str = "es", modelo: str = "op
 
     import torch
     pista = " ".join((letra or "").split())[:800] or None
+    liberar_gpu()
     palabras = []
     if motor in ("auto", "faster-whisper"):
         try:
@@ -565,6 +590,7 @@ def tiempos_de_palabras(audio: str | Path, idioma: str = "es", modelo: str = "op
                 raise
             print("faster-whisper no funcionó aquí, uso transformers:", str(e)[:200])
     if not palabras:
+        liberar_gpu()
         palabras = _palabras_transformers(audio, idioma, modelo)
     gc.collect()
     if gpu():
