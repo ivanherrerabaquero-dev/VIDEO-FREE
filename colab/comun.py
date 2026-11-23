@@ -59,7 +59,13 @@ def preparar(repo: str = REPO, rama: str = RAMA, usar_drive: bool = True, exigir
             try:  # Kaggle: Add-ons → Secrets
                 from kaggle_secrets import UserSecretsClient  # type: ignore
 
-                _token = UserSecretsClient().get_secret("GITHUB_TOKEN")
+                for nombre_secreto in ("GITHUB_TOKEN", "TOKEN"):  # se acepta también «TOKEN»
+                    try:
+                        _token = UserSecretsClient().get_secret(nombre_secreto)
+                        if _token:
+                            break
+                    except Exception:
+                        _token = None
             except Exception:
                 _token = None
     print("GitHub:", f"conectado a {REPO} ({RAMA})" if _token else "sin token (solo lectura). Agrega el secreto GITHUB_TOKEN para guardar.")
@@ -98,8 +104,15 @@ def _cab(raw: bool = False) -> dict:
     return h
 
 
+# Sin token (por ejemplo en Kaggle sin el secreto), lo que se «guarda» queda en esta carpeta, con las mismas rutas del repo,
+# y se lee de aquí primero. En Kaggle es /kaggle/working/VIDEO-FREE: aparece en «Output» y se puede descargar.
+SALIDA = os.environ.get("VIDEOFREE_SALIDA")
+
+
 def leer(camino: str) -> bytes | None:
     """Lee un archivo del repo (cualquier tamaño hasta 100 MB). None si no existe."""
+    if SALIDA and (Path(SALIDA) / camino).is_file():
+        return (Path(SALIDA) / camino).read_bytes()
     url = f"{API}/repos/{REPO}/contents/{camino}?ref={RAMA}"
     r = requests.get(url, headers=_cab(raw=True), timeout=120)
     if r.status_code == 404:
@@ -114,10 +127,16 @@ def leer(camino: str) -> bytes | None:
 
 def guardar(camino: str, datos: bytes | str, mensaje: str) -> str:
     """Crea o actualiza un archivo del repo con un commit. Devuelve el sha del commit."""
-    if not _token:
-        raise RuntimeError("Para guardar en GitHub agrega el secreto GITHUB_TOKEN (icono de llave en Colab) y vuelve a ejecutar preparar().")
     if isinstance(datos, str):
         datos = datos.encode("utf-8")
+    if not _token:
+        if SALIDA:
+            destino = Path(SALIDA) / camino
+            destino.parent.mkdir(parents=True, exist_ok=True)
+            destino.write_bytes(datos)
+            print(f"Guardado aquí (sin GitHub): {destino}")
+            return "local"
+        raise RuntimeError("Para guardar en GitHub agrega el secreto GITHUB_TOKEN (icono de llave en Colab) y vuelve a ejecutar preparar().")
     if len(datos) > 95 * 1024 * 1024:
         raise RuntimeError(f"{camino} pesa {len(datos) / 1048576:.0f} MB; GitHub acepta hasta 100 MB. Guárdalo solo en Drive.")
     import random
@@ -142,11 +161,114 @@ def guardar(camino: str, datos: bytes | str, mensaje: str) -> str:
 
 def listar(carpeta: str) -> list[str]:
     """Nombres de los archivos de una carpeta del repo ([] si no existe)."""
+    locales = []
+    if SALIDA and (Path(SALIDA) / carpeta).is_dir():
+        locales = [f.name for f in (Path(SALIDA) / carpeta).iterdir() if f.is_file()]
     r = requests.get(f"{API}/repos/{REPO}/contents/{carpeta}?ref={RAMA}", headers=_cab(), timeout=60)
-    if r.status_code == 404:
-        return []
+    if r.status_code in (404, 403):  # 403: límite de la API sin token
+        return locales
     r.raise_for_status()
-    return [x["name"] for x in r.json() if x.get("type") == "file"]
+    return sorted(set(locales) | {x["name"] for x in r.json() if x.get("type") == "file"})
+
+
+# ───────────────────────── Archivos grandes: «releases» de GitHub ─────────────────────────
+# Un video largo (30 min) tiene cientos de tomas y el video final pesa más de 100 MB: no caben en el repo.
+# Cada video del director tiene su propio «release» (etiqueta director-<carpeta>), con hasta 1000 archivos de hasta 2 GB.
+# El repo sigue liviano y el token fino con «Contents: Read and write» alcanza.
+_releases: dict = {}
+
+
+def _release(etiqueta: str, crear: bool = True) -> dict | None:
+    if etiqueta in _releases:
+        return _releases[etiqueta]
+    r = requests.get(f"{API}/repos/{REPO}/releases/tags/{etiqueta}", headers=_cab(), timeout=60)
+    if r.status_code == 200:
+        _releases[etiqueta] = r.json()
+    elif r.status_code == 404 and crear and _token:
+        r = requests.post(f"{API}/repos/{REPO}/releases", headers=_cab(), timeout=60,
+                          json={"tag_name": etiqueta, "target_commitish": RAMA, "name": f"VIDEO-FREE · {etiqueta}", "prerelease": True,
+                                "body": "Tomas, fotogramas y video final del director de VIDEO-FREE. Se generan solos desde Colab o Kaggle."})
+        if r.status_code == 422:  # otra GPU lo creó al mismo tiempo
+            r = requests.get(f"{API}/repos/{REPO}/releases/tags/{etiqueta}", headers=_cab(), timeout=60)
+        r.raise_for_status()
+        _releases[etiqueta] = r.json()
+    else:
+        return None
+    return _releases[etiqueta]
+
+
+def _assets(etiqueta: str) -> list[dict]:
+    rel = _release(etiqueta, crear=False)
+    if not rel:
+        return []
+    salida, pagina = [], 1
+    while True:
+        r = requests.get(f"{API}/repos/{REPO}/releases/{rel['id']}/assets?per_page=100&page={pagina}", headers=_cab(), timeout=60)
+        if r.status_code != 200:
+            return salida
+        lote = r.json()
+        salida += lote
+        if len(lote) < 100:
+            return salida
+        pagina += 1
+
+
+def listar_grandes(etiqueta: str) -> list[str]:
+    """Nombres de los archivos guardados en el release `etiqueta` (más los guardados aquí sin token)."""
+    locales = []
+    if SALIDA and (Path(SALIDA) / "releases" / etiqueta).is_dir():
+        locales = [f.name for f in (Path(SALIDA) / "releases" / etiqueta).iterdir() if f.is_file()]
+    return sorted(set(locales) | {a["name"] for a in _assets(etiqueta)})
+
+
+def subir_grande(etiqueta: str, archivo: str | Path) -> str | None:
+    """Sube (o reemplaza) un archivo al release `etiqueta`. Devuelve su enlace de descarga."""
+    import time
+    archivo = Path(archivo)
+    if not _token:
+        if SALIDA:
+            destino = Path(SALIDA) / "releases" / etiqueta / archivo.name
+            destino.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(archivo, destino)
+            print(f"Guardado aquí (sin GitHub): {destino}")
+            return str(destino)
+        raise RuntimeError("Para guardar archivos grandes en GitHub agrega el secreto GITHUB_TOKEN.")
+    if archivo.stat().st_size > 2 * 1024**3 - 1024**2:
+        raise RuntimeError(f"{archivo.name} pesa más de 2 GB, el máximo de GitHub por archivo.")
+    rel = _release(etiqueta)
+    for a in _assets(etiqueta):
+        if a["name"] == archivo.name:
+            requests.delete(f"{API}/repos/{REPO}/releases/assets/{a['id']}", headers=_cab(), timeout=60)
+    url = f"https://uploads.github.com/repos/{REPO}/releases/{rel['id']}/assets?name={archivo.name}"
+    for intento in range(5):
+        with open(archivo, "rb") as f:
+            r = requests.post(url, headers={**_cab(), "Content-Type": "application/octet-stream"}, data=f, timeout=1800)
+        if r.status_code in (200, 201):
+            print(f"Guardado en GitHub (release {etiqueta}): {archivo.name}")
+            return r.json()["browser_download_url"]
+        if r.status_code == 422:  # ya existía (otra GPU lo subió a la vez): se borra y se reintenta
+            for a in _assets(etiqueta):
+                if a["name"] == archivo.name:
+                    requests.delete(f"{API}/repos/{REPO}/releases/assets/{a['id']}", headers=_cab(), timeout=60)
+        time.sleep(3 + intento * 4)
+    raise RuntimeError(f"No pude subir {archivo.name} al release {etiqueta}: {r.status_code} {r.text[:200]}")
+
+
+def bajar_grande(etiqueta: str, nombre: str, destino: str | Path) -> Path | None:
+    """Descarga un archivo del release `etiqueta` (o de la copia local sin token)."""
+    destino = Path(destino)
+    if SALIDA and (Path(SALIDA) / "releases" / etiqueta / nombre).is_file():
+        shutil.copy(Path(SALIDA) / "releases" / etiqueta / nombre, destino)
+        return destino
+    for a in _assets(etiqueta):
+        if a["name"] == nombre:
+            r = requests.get(a["url"], headers={**_cab(), "Accept": "application/octet-stream"}, timeout=1800, stream=True)
+            r.raise_for_status()
+            with open(destino, "wb") as f:
+                for trozo in r.iter_content(1 << 20):
+                    f.write(trozo)
+            return destino
+    return None
 
 
 def a_drive(local: str | Path, nombre: str | None = None) -> Path | None:
@@ -382,6 +504,30 @@ def _cargar_cuda_de_pip() -> None:
             pass
 
 
+def _audio_16k(audio: str | Path):
+    """Audio en 16 kHz mono como arreglo float32, decodificado con ffmpeg (sin depender de PyAV)."""
+    import numpy as np
+    crudo = subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(audio), "-f", "f32le", "-ac", "1", "-ar", "16000", "-"],
+                           capture_output=True, check=True).stdout
+    return np.frombuffer(crudo, dtype=np.float32).copy()
+
+
+def liberar_gpu() -> None:
+    """Suelta la memoria de la GPU, también la que retiene el último error de una celda (guarda el modelo que falló)."""
+    import gc
+    import sys
+    for nombre in ("last_traceback", "last_value", "last_type", "last_exc"):
+        if hasattr(sys, nombre):
+            setattr(sys, nombre, None)
+    gc.collect()
+    try:
+        import torch
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+    except Exception:  # noqa: BLE001
+        pass
+
+
 def _palabras_faster_whisper(audio: str | Path, idioma: str, pista: str | None) -> list[dict]:
     """faster-whisper (MIT, SYSTRAN): más rápido y con filtro de voz (VAD). Se instala al usarlo."""
     import importlib.util
@@ -390,8 +536,10 @@ def _palabras_faster_whisper(audio: str | Path, idioma: str, pista: str | None) 
     _cargar_cuda_de_pip()
     from faster_whisper import WhisperModel  # type: ignore
     g = gpu()
+    # el audio lo decodifica ffmpeg: la versión de PyAV que trae Kaggle no es compatible con faster-whisper
+    muestras = _audio_16k(audio)
     modelo = WhisperModel("large-v3-turbo", device="cuda" if g else "cpu", compute_type="float16" if g else "int8")
-    segmentos, _ = modelo.transcribe(str(audio), language=idioma, word_timestamps=True, vad_filter=True,
+    segmentos, _ = modelo.transcribe(muestras, language=idioma, word_timestamps=True, vad_filter=True,
                                      initial_prompt=pista, condition_on_previous_text=False, beam_size=5)
     palabras = [{"p": w.word.strip(), "inicio": float(w.start), "fin": float(w.end)}
                 for seg in segmentos for w in (seg.words or []) if w.word.strip()]
@@ -400,17 +548,15 @@ def _palabras_faster_whisper(audio: str | Path, idioma: str, pista: str | None) 
 
 
 def _palabras_transformers(audio: str | Path, idioma: str, modelo: str) -> list[dict]:
-    import numpy as np
     import torch
     from transformers import pipeline  # type: ignore
 
-    # El audio lo decodifica ffmpeg (16 kHz, mono): así no dependemos de la versión de PyAV que traiga Colab
-    crudo = subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-i", str(audio), "-f", "f32le", "-ac", "1", "-ar", "16000", "-"],
-                           capture_output=True, check=True).stdout
-    muestras = np.frombuffer(crudo, dtype=np.float32).copy()
+    muestras = _audio_16k(audio)
     g = gpu()
-    asr = pipeline("automatic-speech-recognition", model=modelo, torch_dtype=torch.float16 if g else torch.float32, device=0 if g else -1)
-    r = asr({"raw": muestras, "sampling_rate": 16000}, return_timestamps="word", chunk_length_s=30, batch_size=8,
+    # con dos GPU (Kaggle) usa la que tenga más memoria libre
+    disp = max(range(torch.cuda.device_count()), key=lambda i: torch.cuda.mem_get_info(i)[0]) if g else -1
+    asr = pipeline("automatic-speech-recognition", model=modelo, torch_dtype=torch.float16 if g else torch.float32, device=disp)
+    r = asr({"raw": muestras, "sampling_rate": 16000}, return_timestamps="word", chunk_length_s=30, batch_size=4,
             generate_kwargs={"language": idioma, "task": "transcribe"})
     palabras = []
     for ch in r.get("chunks", []):
@@ -433,6 +579,7 @@ def tiempos_de_palabras(audio: str | Path, idioma: str = "es", modelo: str = "op
 
     import torch
     pista = " ".join((letra or "").split())[:800] or None
+    liberar_gpu()
     palabras = []
     if motor in ("auto", "faster-whisper"):
         try:
@@ -443,6 +590,7 @@ def tiempos_de_palabras(audio: str | Path, idioma: str = "es", modelo: str = "op
                 raise
             print("faster-whisper no funcionó aquí, uso transformers:", str(e)[:200])
     if not palabras:
+        liberar_gpu()
         palabras = _palabras_transformers(audio, idioma, modelo)
     gc.collect()
     if gpu():
