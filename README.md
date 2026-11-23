@@ -104,6 +104,15 @@ Kaggle da unas 30 horas de GPU por semana (dos T4 a la vez) y se recargan cada s
 
 Para usarlos: verifica tu teléfono en Kaggle, importa el cuaderno (*File → Import Notebook*), elige *GPU T4 x2* e *Internet On*, y agrega el secreto `GITHUB_TOKEN` en *Add-ons → Secrets*.
 
+### Videos largos (hasta 30 minutos)
+
+El director reparte el video en tomas según los compases. Un video de 4 minutos tiene unas 50 tomas y uno de 30 minutos, unas 390.
+
+- Los fotogramas, las tomas y el video final no se guardan en el repo: van a un *release* de GitHub propio de cada video (`director-<carpeta>`). Allí caben hasta 1000 archivos de hasta 2 GB, y el repo sigue liviano.
+- El video final se graba con un tope de bits: 30 minutos en 1080p pesan unos 1,4 GB.
+- Si la sesión de Kaggle se corta (máximo 12 horas), vuelve a correr el cuaderno: sigue desde las tomas que ya están en el release. Un video de 30 minutos en borrador tarda unas 13 horas con las dos GPU, o sea dos sesiones de Kaggle.
+- El audio debe durar lo mismo que el video. El cuaderno de canción hace canciones de hasta 10 minutos; para 30 minutos usa tu propio audio largo (por ejemplo, varias canciones unidas) como audio del proyecto.
+
 **Seedance** (de ByteDance) es un modelo cerrado. No publica sus pesos y solo se usa pagando su API, así que no puede correr en Colab. Wan 2.2 es el modelo de video abierto más avanzado que se puede descargar.
 
 Estos modelos son de terceros con licencias abiertas. El detalle está en `colab/LICENCIAS-TERCEROS.md`.
