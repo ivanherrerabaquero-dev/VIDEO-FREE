@@ -441,6 +441,9 @@ def montar(plano: list[dict], clips: dict[int, str | Path], audio: str | Path, s
     carpeta.mkdir(parents=True, exist_ok=True)
     partes = []
     total = plano[-1]["hasta"]
+    # tope de bits: así un video de 30 min en 1080p queda en ~1.4 GB (GitHub acepta hasta 2 GB por archivo)
+    tasa = 6 if resolucion >= 1080 else 3
+    tope = ["-maxrate", f"{tasa}M", "-bufsize", f"{tasa * 2}M"]
     for t in plano:
         dur = t["hasta"] - t["desde"]
         filtros = [f"scale={W}:{H}:force_original_aspect_ratio=increase:flags=lanczos", f"crop={W}:{H}",
@@ -476,7 +479,7 @@ def montar(plano: list[dict], clips: dict[int, str | Path], audio: str | Path, s
         else:
             entrada = ["-f", "lavfi", "-i", f"color=c=black:s={W}x{H}:r={fps}"]
         _ffmpeg([*entrada, "-t", f"{dur:.3f}", "-vf", ",".join(filtros), "-an", "-c:v", "libx264", "-preset", "veryfast",
-                 "-crf", str(crf), "-r", str(fps), "-pix_fmt", "yuv420p", str(temporal)])
+                 "-crf", str(crf), *tope, "-r", str(fps), "-pix_fmt", "yuv420p", str(temporal)])
         temporal.replace(destino)
         partes.append(destino)
     lista = carpeta / "lista.txt"
@@ -488,6 +491,9 @@ def montar(plano: list[dict], clips: dict[int, str | Path], audio: str | Path, s
     _ffmpeg(["-i", str(mudo), "-i", str(audio), "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "192k",
              "-t", f"{total:.3f}", "-movflags", "+faststart", str(temporal)])
     temporal.replace(salida)
+    # las piezas ya están dentro del video: se borran para no llenar el disco (un video de 30 min tiene cientos)
+    for p in [*partes, mudo]:
+        p.unlink(missing_ok=True)
     return salida
 
 

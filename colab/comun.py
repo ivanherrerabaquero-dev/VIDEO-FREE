@@ -171,6 +171,106 @@ def listar(carpeta: str) -> list[str]:
     return sorted(set(locales) | {x["name"] for x in r.json() if x.get("type") == "file"})
 
 
+# ───────────────────────── Archivos grandes: «releases» de GitHub ─────────────────────────
+# Un video largo (30 min) tiene cientos de tomas y el video final pesa más de 100 MB: no caben en el repo.
+# Cada video del director tiene su propio «release» (etiqueta director-<carpeta>), con hasta 1000 archivos de hasta 2 GB.
+# El repo sigue liviano y el token fino con «Contents: Read and write» alcanza.
+_releases: dict = {}
+
+
+def _release(etiqueta: str, crear: bool = True) -> dict | None:
+    if etiqueta in _releases:
+        return _releases[etiqueta]
+    r = requests.get(f"{API}/repos/{REPO}/releases/tags/{etiqueta}", headers=_cab(), timeout=60)
+    if r.status_code == 200:
+        _releases[etiqueta] = r.json()
+    elif r.status_code == 404 and crear and _token:
+        r = requests.post(f"{API}/repos/{REPO}/releases", headers=_cab(), timeout=60,
+                          json={"tag_name": etiqueta, "target_commitish": RAMA, "name": f"VIDEO-FREE · {etiqueta}", "prerelease": True,
+                                "body": "Tomas, fotogramas y video final del director de VIDEO-FREE. Se generan solos desde Colab o Kaggle."})
+        if r.status_code == 422:  # otra GPU lo creó al mismo tiempo
+            r = requests.get(f"{API}/repos/{REPO}/releases/tags/{etiqueta}", headers=_cab(), timeout=60)
+        r.raise_for_status()
+        _releases[etiqueta] = r.json()
+    else:
+        return None
+    return _releases[etiqueta]
+
+
+def _assets(etiqueta: str) -> list[dict]:
+    rel = _release(etiqueta, crear=False)
+    if not rel:
+        return []
+    salida, pagina = [], 1
+    while True:
+        r = requests.get(f"{API}/repos/{REPO}/releases/{rel['id']}/assets?per_page=100&page={pagina}", headers=_cab(), timeout=60)
+        if r.status_code != 200:
+            return salida
+        lote = r.json()
+        salida += lote
+        if len(lote) < 100:
+            return salida
+        pagina += 1
+
+
+def listar_grandes(etiqueta: str) -> list[str]:
+    """Nombres de los archivos guardados en el release `etiqueta` (más los guardados aquí sin token)."""
+    locales = []
+    if SALIDA and (Path(SALIDA) / "releases" / etiqueta).is_dir():
+        locales = [f.name for f in (Path(SALIDA) / "releases" / etiqueta).iterdir() if f.is_file()]
+    return sorted(set(locales) | {a["name"] for a in _assets(etiqueta)})
+
+
+def subir_grande(etiqueta: str, archivo: str | Path) -> str | None:
+    """Sube (o reemplaza) un archivo al release `etiqueta`. Devuelve su enlace de descarga."""
+    import time
+    archivo = Path(archivo)
+    if not _token:
+        if SALIDA:
+            destino = Path(SALIDA) / "releases" / etiqueta / archivo.name
+            destino.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(archivo, destino)
+            print(f"Guardado aquí (sin GitHub): {destino}")
+            return str(destino)
+        raise RuntimeError("Para guardar archivos grandes en GitHub agrega el secreto GITHUB_TOKEN.")
+    if archivo.stat().st_size > 2 * 1024**3 - 1024**2:
+        raise RuntimeError(f"{archivo.name} pesa más de 2 GB, el máximo de GitHub por archivo.")
+    rel = _release(etiqueta)
+    for a in _assets(etiqueta):
+        if a["name"] == archivo.name:
+            requests.delete(f"{API}/repos/{REPO}/releases/assets/{a['id']}", headers=_cab(), timeout=60)
+    url = f"https://uploads.github.com/repos/{REPO}/releases/{rel['id']}/assets?name={archivo.name}"
+    for intento in range(5):
+        with open(archivo, "rb") as f:
+            r = requests.post(url, headers={**_cab(), "Content-Type": "application/octet-stream"}, data=f, timeout=1800)
+        if r.status_code in (200, 201):
+            print(f"Guardado en GitHub (release {etiqueta}): {archivo.name}")
+            return r.json()["browser_download_url"]
+        if r.status_code == 422:  # ya existía (otra GPU lo subió a la vez): se borra y se reintenta
+            for a in _assets(etiqueta):
+                if a["name"] == archivo.name:
+                    requests.delete(f"{API}/repos/{REPO}/releases/assets/{a['id']}", headers=_cab(), timeout=60)
+        time.sleep(3 + intento * 4)
+    raise RuntimeError(f"No pude subir {archivo.name} al release {etiqueta}: {r.status_code} {r.text[:200]}")
+
+
+def bajar_grande(etiqueta: str, nombre: str, destino: str | Path) -> Path | None:
+    """Descarga un archivo del release `etiqueta` (o de la copia local sin token)."""
+    destino = Path(destino)
+    if SALIDA and (Path(SALIDA) / "releases" / etiqueta / nombre).is_file():
+        shutil.copy(Path(SALIDA) / "releases" / etiqueta / nombre, destino)
+        return destino
+    for a in _assets(etiqueta):
+        if a["name"] == nombre:
+            r = requests.get(a["url"], headers={**_cab(), "Accept": "application/octet-stream"}, timeout=1800, stream=True)
+            r.raise_for_status()
+            with open(destino, "wb") as f:
+                for trozo in r.iter_content(1 << 20):
+                    f.write(trozo)
+            return destino
+    return None
+
+
 def a_drive(local: str | Path, nombre: str | None = None) -> Path | None:
     """Copia un archivo a Google Drive (VIDEO-FREE/), si Drive está montado."""
     if not _drive:

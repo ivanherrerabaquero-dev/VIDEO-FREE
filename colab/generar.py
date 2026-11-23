@@ -85,7 +85,9 @@ class Director:
         import hashlib
         huella = hashlib.sha1(f"{self.p.get('audio')}|{round(self.duracion, 1)}".encode()).hexdigest()[:6]
         self.carpeta = f"{self.nombre}_{cfg.formato}{'_borrador' if cfg.borrador else ''}_{huella}"
-        self.base = f"medios/director/{self.carpeta}"   # lo compartido entre GPU, en tu repo
+        self.base = f"medios/director/{self.carpeta}"   # lo compartido entre GPU, en tu repo (solo textos: plano y marcas)
+        # fotogramas, tomas y video pesan mucho: van al «release» de GitHub de este video (hasta 1000 archivos de 2 GB)
+        self.etiqueta = f"director-{self.carpeta}"
         self.local = comun.TRABAJO / self.carpeta
         self.local.mkdir(parents=True, exist_ok=True)
         self.plano = self._plano()
@@ -125,10 +127,18 @@ class Director:
 
     # ───────────── archivos compartidos ─────────────
     def _en_repo(self) -> set[str]:
+        """Lo que ya existe, hecho aquí, por otra GPU o en otra sesión: marcas en el repo y archivos en el release."""
+        hay = {f.name for f in self.local.iterdir() if f.is_file() and f.stat().st_size > 0}
         try:
-            return set(comun.listar(self.base))
+            hay |= set(comun.listar(self.base))
         except Exception:
-            return set()
+            pass
+        try:
+            self._grandes = set(comun.listar_grandes(self.etiqueta))
+            hay |= self._grandes
+        except Exception as e:
+            print("No pude leer el release:", str(e)[:120])
+        return hay
 
     def _traer(self, nombre: str, en_repo: set[str] | None = None) -> Path | None:
         """Busca un archivo: aquí, en Drive o en el repo (hecho por otra GPU o en otra sesión)."""
@@ -142,7 +152,13 @@ class Director:
         if en_repo is None:
             en_repo = self._en_repo()
         if nombre in en_repo:
-            datos = comun.leer(f"{self.base}/{nombre}")
+            if nombre in getattr(self, "_grandes", set()):
+                try:
+                    if comun.bajar_grande(self.etiqueta, nombre, local):
+                        return local
+                except Exception as e:
+                    print(f"No pude bajar {nombre}:", str(e)[:120])
+            datos = comun.leer(f"{self.base}/{nombre}")  # versiones anteriores lo guardaban en el repo
             if datos:
                 local.write_bytes(datos)
                 return local
@@ -152,7 +168,10 @@ class Director:
         comun.a_drive(local, f"director/{self.carpeta}/{local.name}")
         if comun._token or comun.SALIDA:
             try:
-                comun.guardar(f"{self.base}/{local.name}", local.read_bytes(), mensaje)
+                if local.suffix in (".txt", ".json"):
+                    comun.guardar(f"{self.base}/{local.name}", local.read_bytes(), mensaje)
+                else:
+                    comun.subir_grande(self.etiqueta, local)
             except Exception as e:
                 print("No pude subirlo a GitHub:", str(e)[:150])
 
@@ -518,12 +537,23 @@ class Director:
     def guardar(self, poner_en_escenas: bool = True) -> str:
         """Sube el video al repo y, si se pide, convierte cada toma en una escena `video` del portal."""
         salida = self.video
+        # 1) el video completo, en calidad final, al release (hasta 2 GB: alcanza para 30 min en 1080p)
+        enlace = comun.subir_grande(self.etiqueta, salida)
+        # 2) una copia en el repo para el portal, solo si cabe (GitHub no acepta archivos de más de 100 MB)
+        destino = None
         final = salida
-        if salida.stat().st_size > 90 * 2**20:
+        if salida.stat().st_size > 90 * 2**20 and self.duracion <= 8 * 60:
             final = salida.with_name(salida.stem + "_liviano.mp4")
             comun.sh(f'ffmpeg -hide_banner -loglevel error -y -i "{salida}" -c:v libx264 -crf 26 -preset medium -c:a copy -movflags +faststart "{final}"')
-        destino = f"medios/videos/{salida.name}"
-        comun.guardar(destino, final.read_bytes(), f"Video director: {self.p.get('titulo')} ({self.carpeta})")
+        if final.stat().st_size <= 90 * 2**20:
+            destino = f"medios/videos/{salida.name}"
+            comun.guardar(destino, final.read_bytes(), f"Video director: {self.p.get('titulo')} ({self.carpeta})")
+        else:
+            print("El video es muy largo para el repo; queda en el release:", enlace)
+        # las escenas del portal apuntan a cada toma: solo para videos cortos (en uno de 30 min serían cientos de archivos)
+        if poner_en_escenas and len(self.plano) > 80:
+            print(f"No pongo las {len(self.plano)} tomas como escenas del portal (son demasiadas); el video completo queda guardado.")
+            poner_en_escenas = False
         p = comun.proyecto(self.cfg.proyecto)  # leído de nuevo, por si cambió mientras tanto
         filtros = {"byn": "byn", "fantasma": "frio", "noche": "frio", "dorado": "calido"}
         if poner_en_escenas:
@@ -532,6 +562,9 @@ class Director:
                 f = self.listos.get(t["n"])
                 if not f or Path(f).suffix != ".mp4":
                     continue
+                # el portal lee las escenas del repo: se copia ahí cada toma usada
+                if Path(f).name not in self._en_repo_textos():
+                    comun.guardar(f"{self.base}/{Path(f).name}", Path(f).read_bytes(), f"Director: escena {Path(f).name}")
                 e = {"tipo": "video", "desde": t["desde"], "hasta": t["hasta"], "archivo": f"{self.base}/{Path(f).name}", "inicioClip": 0,
                      "ia": {"director": t["clase"], "prompt": t["mueve"], "labios": Path(f).name.startswith("labios_")}}
                 if t["grado"] in filtros:
@@ -540,11 +573,22 @@ class Director:
             if nuevas:
                 p.setdefault("escenas_antes_director", p["escenas"])
                 p["escenas"] = nuevas
-        p["director"] = {"plano": self.plano, "formato": self.cfg.formato, "video": destino, "carpeta": self.base,
+        p["director"] = {"plano": self.plano, "formato": self.cfg.formato, "video": destino or enlace, "video_completo": enlace,
+                         "release": self.etiqueta, "carpeta": self.base,
                          "config": {k: v for k, v in asdict(self.cfg).items() if k not in ("trabajador", "trabajadores", "rehacer")}}
         comun.guardar_proyecto(self.cfg.proyecto, p, f"Proyecto: video director para {p.get('titulo')}")
-        print("Listo. Video en", destino, "· En el portal pulsa «Recargar proyecto».")
-        return destino
+        print("Listo. Video completo:", enlace)
+        if destino:
+            print("Copia para el portal en", destino, "· En el portal pulsa «Recargar proyecto».")
+        return destino or enlace
+
+    def _en_repo_textos(self) -> set[str]:
+        if not hasattr(self, "_repo_cache"):
+            try:
+                self._repo_cache = set(comun.listar(self.base))
+            except Exception:
+                self._repo_cache = set()
+        return self._repo_cache
 
     def trabajar(self) -> None:
         """Lo que hace cada GPU: fotogramas, movimiento y labios de sus tomas."""
