@@ -1,3 +1,7 @@
-eofree/ls_env/lib/python3.10/site-packages/matplotlib/__init__.py", line 774, in __setitem__
-    raise ValueError(f"Key {key}: {ve}") from None
-ValueError: Key backend: 'module://matplotlib_inline.backend_inline' is not a valid value for backend; supported values are ['gtk3agg', 'gtk3cairo', 'gtk4agg', 'gtk4cairo', 'macosx', 'nbagg', 'notebook', 'qtagg', 'qtcairo', 'qt5agg', 'qt5cairo', 'tkagg', 'tkcairo', 'webagg', 'wx', 'wxagg', 'wxcairo', 'agg', 'cairo', 'pdf', 'pgf', 'ps', 'svg', 'template']
+/pipelines/lipsync_pipeline.py", line 284, in loop_video
+    faces, boxes, affine_matrices = self.affine_transform_video(video_frames)
+  File "/tmp/videofree/latentsync/latentsync/pipelines/lipsync_pipeline.py", line 258, in affine_transform_video
+    face, box, affine_matrix = self.image_processor.affine_transform(frame)
+  File "/tmp/videofree/latentsync/latentsync/utils/image_processor.py", line 59, in affine_transform
+    raise RuntimeError("Face not detected")
+RuntimeError: Face not detected
