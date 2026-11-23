@@ -31,6 +31,9 @@ LS_COMMIT = "a229c3948406bc2cf6eaf4873e662e70c6a04746"
 _BASE = __import__("os").environ.get("VIDEOFREE_HERRAMIENTAS", "/content")
 LS_DIR = f"{_BASE}/latentsync"   # código de LatentSync
 LS_ENV = f"{_BASE}/ls_env"       # su entorno de Python aparte
+# Lo que hereda del cuaderno no sirve en su Python aparte: el gráfico «inline» de Jupyter rompía matplotlib
+# («'module://matplotlib_inline.backend_inline' is not a valid value for backend») y fallaban todas las tomas.
+ENTORNO_LS = {"MPLBACKEND": "Agg", "PYTHONPATH": "", "PYTHONNOUSERSITE": "1"}
 
 
 @dataclass
@@ -51,6 +54,7 @@ class Config:
     trabajador: int = 1
     trabajadores: int = 1
     rehacer: list = field(default_factory=list)
+    solo_labios: bool = False   # solo repite los labios de las tomas que cantan (las tomas ya existen)
 
     @property
     def borrador(self) -> bool:
@@ -455,7 +459,7 @@ class Director:
             f = None if n in cfg.rehacer else self._traer(f"labios_{n:02d}.mp4", en_repo)
             if f:
                 self.tomas[n] = f
-            elif f"sin_labios_{n:02d}.txt" not in en_repo:
+            elif n in cfg.rehacer or f"sin_labios_{n:02d}.txt" not in en_repo:
                 pendientes.append(t)
         if not pendientes:
             return self.tomas
@@ -472,7 +476,7 @@ class Director:
                 comun.sh(f'{LS_ENV}/bin/python -m scripts.inference --unet_config_path "{config}" '
                          f'--inference_ckpt_path checkpoints/latentsync_unet.pt --inference_steps {pasos} --guidance_scale 1.5 '
                          f'--enable_deepcache --video_path "{self.tomas[n]}" --audio_path "{tramo}" --video_out_path "{crudo}"',
-                         cwd=LS_DIR)
+                         cwd=LS_DIR, env=ENTORNO_LS)
             except RuntimeError as e:
                 print(f"Toma {n}: LatentSync no pudo con esta toma; queda sin labios sincronizados.\n{str(e)[-800:]}")
                 self._marca(f"sin_labios_{n:02d}.txt", str(e)[-500:])
@@ -594,6 +598,17 @@ class Director:
         """Lo que hace cada GPU: fotogramas, movimiento y labios de sus tomas."""
         print(self.tabla())
         print(f"\nTrabajador {self.cfg.trabajador} de {self.cfg.trabajadores}: tomas {[t['n'] for t in self.mias()]}")
+        if self.cfg.solo_labios:
+            en_repo = self._en_repo()
+            for t in self.mias():
+                f = self._traer(f"toma_{t['n']:02d}.mp4", en_repo)
+                if f:
+                    self.tomas[t["n"]] = f
+            # vuelve a intentar también las que quedaron marcadas «sin labios»
+            self.cfg.rehacer = [t["n"] for t in self.mias() if t["canta"] and f"labios_{t['n']:02d}.mp4" not in en_repo]
+            self.labios()
+            print(f"Trabajador {self.cfg.trabajador}: labios terminados")
+            return
         self.fotogramas()
         self.animar()
         self.labios()
